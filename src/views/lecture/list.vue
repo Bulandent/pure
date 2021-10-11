@@ -1,7 +1,6 @@
 <template>
 	<div class="accountManagement">
 		<div class="accMent-tab m1-margin-top-to-bottom">
-			<!-- <el-button>回访名单</el-button> -->
 			<div></div>
 			<div class="AddLayMent" @click.stop="addLecture">新增沙龙讲座</div>
 		</div>

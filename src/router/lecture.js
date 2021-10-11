@@ -4,7 +4,7 @@ export const lecture = [
 	{
 		path: '/lecture',
 		component: Layout,
-		meta: { title: '沙龙讲座', icon: 'service', noCache: true },
+		meta: { title: '', icon: 'service', noCache: true },
 		redirect: '/lecture/list',
 		children: [
 			{
@@ -15,19 +15,20 @@ export const lecture = [
 			},
 			{
 				path: 'list',
-				component: () => import('@/views/lecture/index'),
+				component: () => import('@/views/layout/menuIndex'),
 				name: 'lectureList',
 				meta: { title: '沙龙讲座', icon: 'service', noCache: true },
+				hidden: true,
 				children: [
 					{
-						path: 'add',
+						path: '/lecture/add',
 						component: () => import('@/views/lecture/detail'),
 						name: 'addLecture',
 						hidden: true,
 						meta: { title: '新增沙龙讲座', icon: 'service', noCache: true },
 					},
 					{
-						path: 'detail',
+						path: '/lecture/detail',
 						component: () => import('@/views/lecture/detail'),
 						name: 'lectureDetail',
 						hidden: true,
