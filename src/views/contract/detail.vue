@@ -1,48 +1,54 @@
 <template>
-	<div class="lecture-detail">
+	<div class="contract-detail">
 		<el-tabs v-model="activeTab" @tab-click="handleClick">
-			<el-tab-pane label="讲座信息" name="first"></el-tab-pane>
-			<el-tab-pane v-if="isDetail" label="用户管理" name="second"></el-tab-pane>
+			<el-tab-pane label="模板信息" name="first"></el-tab-pane>
 		</el-tabs>
-		<div v-show="activeTab === 'first'" class="lecture-first">
+		<div class="contract-first">
 			<div v-if="isDisabled" class="edit-btn">
 				<i @click="isEdit = !isEdit" class="el-icon-edit-outline"></i>
 			</div>
-			<el-form :model="lectureForm" :rules="rules" ref="lectureForm" label-width="120px">
-				<el-form-item label="宣传图" prop="pictureUrl" style="width: 100%">
+			<el-form :model="contractForm" :rules="rules" ref="contractForm" label-width="120px">
+				<el-form-item label="模板名称" prop="templateName">
+					<el-input
+						type="text"
+						v-model="contractForm.templateName"
+						:disabled="isDisabled"
+					></el-input>
+				</el-form-item>
+				<el-form-item label="模板类型" prop="templateType">
+					<el-cascader
+						v-model="contractForm.templateType"
+						:options="templateList"
+						placeholder="模板类型"
+					></el-cascader>
+				</el-form-item>
+				<el-form-item label="模板简介" prop="templateDesc">
+					<el-input
+						type="text"
+						v-model="contractForm.templateDesc"
+						:disabled="isDisabled"
+						maxlength="80"
+					></el-input>
+				</el-form-item>
+				<el-form-item label="模板文件" prop="applyStartTime">
 					<el-upload
-						class="picture-uploader"
-						:class="{ 'disabled-upload': isDisabled }"
-						:show-file-list="false"
+						class="upload-demo"
 						action=""
-						:on-success="handlepictureSuccess"
-						:before-upload="beforepictureUpload"
-						:disabled="isDisabled"
+						:on-change="handleTemplateFileChange"
+						:show-file-list="false"
 					>
-						<img v-if="lectureForm.pictureUrl" :src="lectureForm.pictureUrl" class="picture" />
-						<i v-else class="el-icon-plus picture-uploader-icon"></i>
+						<el-input
+							type="text"
+							v-model="contractForm.templateUrl"
+							placeholder="点击上传"
+						></el-input>
 					</el-upload>
-				</el-form-item>
-				<el-form-item label="讲座名称" prop="lectureName">
-					<el-input type="text" v-model="lectureForm.lectureName" :disabled="isDisabled"></el-input>
-				</el-form-item>
-				<el-form-item label="讲座主办方" prop="sponsor">
-					<el-input type="text" v-model="lectureForm.sponsor" :disabled="isDisabled"></el-input>
-				</el-form-item>
-				<el-form-item label="报名开始时间" prop="applyStartTime">
-					<el-date-picker
-						type="datetime"
-						placeholder="选择时间"
-						v-model="lectureForm.applyStartTime"
-						:disabled="isDisabled"
-						style="width: 100%"
-					></el-date-picker>
 				</el-form-item>
 				<el-form-item label="活动开始时间" prop="actStartTime">
 					<el-date-picker
 						type="datetime"
 						placeholder="选择时间"
-						v-model="lectureForm.actStartTime"
+						v-model="contractForm.actStartTime"
 						:disabled="isDisabled"
 						style="width: 100%"
 					></el-date-picker>
@@ -51,25 +57,25 @@
 					<el-col :span="21">
 						<el-input
 							type="text"
-							v-model="lectureForm.countPerson"
+							v-model="contractForm.countPerson"
 							:disabled="isDisabled"
 						></el-input>
 					</el-col>
 					<el-col :span="2" style="text-align: right">人</el-col>
 				</el-form-item>
 				<el-form-item label="活动地址" prop="address" style="float: right">
-					<el-input type="text" v-model="lectureForm.address" :disabled="isDisabled"></el-input>
+					<el-input type="text" v-model="contractForm.address" :disabled="isDisabled"></el-input>
 				</el-form-item>
-				<el-form-item label="详情" prop="lectureDetail" style="width: 100%">
+				<el-form-item label="详情" prop="contractDetail" style="width: 100%">
 					<el-input
 						type="textarea"
-						v-model="lectureForm.lectureDetail"
+						v-model="contractForm.contractDetail"
 						:disabled="isDisabled"
 						rows="4"
 					></el-input>
 				</el-form-item>
-				<el-form-item label="须知模板" prop="lectureTemplate">
-					<el-select v-model="lectureForm.lectureTemplate" :disabled="isDisabled">
+				<el-form-item label="须知模板" prop="contractTemplate">
+					<el-select v-model="contractForm.contractTemplate" :disabled="isDisabled">
 						<el-option
 							v-for="item in templateList"
 							:label="item.label"
@@ -84,45 +90,6 @@
 				<el-button @click="goBack">返回</el-button>
 			</div>
 		</div>
-		<div class="lecture-second" v-show="activeTab === 'second'">
-			<div class="ls-tips">
-				已有
-				<span>{{ applyCount }}</span>
-				报名，剩下
-				<span>{{ restCount }}</span>
-				个名额
-			</div>
-			<el-table
-				:data="tableData"
-				header-row-class-name="updatecolumn"
-				:header-row-style="
-					() => {
-						return 'color:black;font-size:15px'
-					}
-				"
-				style="width: 100%"
-			>
-				<el-table-column prop="applyName" label="报名人名称"></el-table-column>
-				<el-table-column prop="mobile" label="手机号"></el-table-column>
-				<el-table-column prop="roleName" label="角色"></el-table-column>
-				<el-table-column prop="countPerson" label="报名人数"></el-table-column>
-				<el-table-column prop="payment" label="支付金额（元）"></el-table-column>
-				<el-table-column prop="applyTime" label="报名时间"></el-table-column>
-				<el-table-column prop="platform" label="报名平台"></el-table-column>
-			</el-table>
-			<div class="page-box" v-if="tableData.length > 0">
-				<el-pagination
-					background
-					@size-change="handleSizeChange"
-					@current-change="currentChange"
-					:page-sizes="[10, 20, 30, 40]"
-					:current-page.sync="page"
-					:page-size="pageSize"
-					layout=" prev, pager, next, sizes, total,jumper"
-					:total="Total"
-				></el-pagination>
-			</div>
-		</div>
 	</div>
 </template>
 
@@ -132,32 +99,52 @@ export default {
 	components: {},
 	data() {
 		return {
-			lectureNo: '',
+			contractNo: '',
 			activeTab: 'first',
 			isDetail: false,
 			isRequesting: false,
 			isEdit: false,
 			applyCount: 10,
 			restCount: 12,
-			lectureForm: {
-				pictureUrl: null,
-				lectureName: null,
+			contractForm: {
+				templateUrl: null,
+				contractName: null,
 				sponsor: null,
 				applyStartTime: null,
 				actStartTime: null,
 				countPerson: null,
 				address: null,
-				lectureDetail: null,
-				lectureTemplate: null,
+				contractDetail: null,
+				contractTemplate: null,
 			},
 			templateList: [
 				{
-					label: '模板一',
-					value: '1',
+					value: 'a1',
+					label: '一级a',
+					children: [
+						{
+							value: 'a2',
+							label: '二级a1',
+						},
+						{
+							value: 'a3',
+							label: '二级a2',
+						},
+					],
 				},
 				{
-					label: '模板二',
-					value: '2',
+					value: 'b1',
+					label: '一级b',
+					children: [
+						{
+							value: 'b1',
+							label: '二级b1',
+						},
+						{
+							value: 'b2',
+							label: '二级b2',
+						},
+					],
 				},
 			],
 			Total: 0,
@@ -176,13 +163,13 @@ export default {
 			page: 1,
 			rules: {
 				pictureUrl: [{ required: true, message: '必填', trigger: 'change' }],
-				lectureName: [{ required: true, message: '必填', trigger: 'blur' }],
+				contractName: [{ required: true, message: '必填', trigger: 'blur' }],
 				sponsor: [{ required: true, message: '必填', trigger: 'blur' }],
 				applyStartTime: [{ required: true, message: '必填', trigger: 'change' }],
 				actStartTime: [{ required: true, message: '必填', trigger: 'change' }],
 				address: [{ required: true, message: '必填', trigger: 'blur' }],
-				lectureDetail: [{ required: true, message: '必填', trigger: 'blur' }],
-				lectureTemplate: [{ required: true, message: '必填', trigger: 'change' }],
+				contractDetail: [{ required: true, message: '必填', trigger: 'blur' }],
+				contractTemplate: [{ required: true, message: '必填', trigger: 'change' }],
 				countPerson: [
 					{ required: true, message: '必填', trigger: 'blur' },
 					{ pattern: /(?:^[0-9]$)|(?:^[1-9][0-9]+$)/, message: '格式不正确', trigger: 'blur' },
@@ -199,12 +186,13 @@ export default {
 		console.log(this.$route)
 		this.isDetail = this.$route.path.includes('detail')
 		if (this.isDetail) {
-			this.lectureNo = this.$route.query.lectureNo
+			this.contractNo = this.$route.query.contractNo
 			this.getDetail()
 			this.getApplyList()
 		}
 	},
 	methods: {
+		handleTemplateFileChange(file, fileList) {},
 		getDetail() {
 			// 获取详情
 		},
@@ -213,7 +201,7 @@ export default {
 		},
 		goBack() {
 			this.$router.push({
-				path: '/lecture/list',
+				path: '/contract/list',
 			})
 		},
 		handleSizeChange(e) {
@@ -229,7 +217,7 @@ export default {
 			this.isRequesting = true
 
 			let flag = true
-			this.$refs['lectureForm'].validate(valid => {
+			this.$refs['contractForm'].validate(valid => {
 				if (!valid) {
 					flag = false
 				}
@@ -239,13 +227,13 @@ export default {
 			console.log('接口提交中')
 		},
 		resetForm() {
-			this.$refs['lectureForm'].resetFields()
+			this.$refs['contractForm'].resetFields()
 		},
 		handleClick(tab, event) {
 			console.log(tab, event)
 		},
 		handlepictureSuccess(res, file) {
-			this.lectureForm.picture = URL.createObjectURL(file.raw)
+			this.contractForm.picture = URL.createObjectURL(file.raw)
 		},
 		beforepictureUpload(file) {
 			const isJPG = file.type === 'image/jpeg'
@@ -264,7 +252,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.lecture-detail {
+.contract-detail {
 	.ls-tips {
 		padding: 20px;
 		span {
@@ -275,7 +263,7 @@ export default {
 		text-align: center;
 		padding-top: 10px;
 	}
-	.lecture-first {
+	.contract-first {
 		position: relative;
 		padding-top: 20px;
 	}

@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Layout from '@/views/layout/Layout'
 import { lecture } from './lecture'
+import { contract } from './contract'
 
 Vue.use(Router)
 const originalPush = Router.prototype.push
@@ -83,6 +84,7 @@ export const constantRouterMap = [
 		],
 	},
 	...lecture,
+	...contract,
 ]
 
 export default new Router({

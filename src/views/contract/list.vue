@@ -2,7 +2,7 @@
 	<div class="accountManagement">
 		<div class="accMent-tab m1-margin-top-to-bottom">
 			<div></div>
-			<div class="AddLayMent" @click.stop="addLecture">新增沙龙讲座</div>
+			<div class="AddLayMent" @click.stop="addContract">新增合同模板</div>
 		</div>
 		<div class="LayMent-input m1-margin-top-to-bottom">
 			<div class="select-3 m1-margin-left-to-right">
@@ -15,11 +15,18 @@
 					></el-option>
 				</el-select>
 			</div>
+			<div class="select-3 m1-margin-left-to-right">
+				<el-cascader
+					v-model="queryParams.templateType"
+					:options="templateList"
+					placeholder="模板类型"
+				></el-cascader>
+			</div>
 			<div class="search m1-margin-left-to-right">
 				<el-input
 					:clearable="true"
-					placeholder="搜索讲座名称"
-					v-model="queryParams.lectureName"
+					placeholder="搜索模板名称"
+					v-model="queryParams.templateName"
 					class="input-with-select active-margin"
 				>
 					<el-button
@@ -49,17 +56,19 @@
 					"
 					style="width: 100%"
 				>
-					<el-table-column prop="lectureNo" label="讲座编号"></el-table-column>
-					<el-table-column prop="lectureName" label="讲座名称"></el-table-column>
-					<el-table-column prop="sponsor" label="主办方"></el-table-column>
-					<el-table-column prop="countPerson" label="可报名人数"></el-table-column>
+					<el-table-column prop="templateNo" label="模板编号"></el-table-column>
+					<el-table-column prop="templateName" label="模板名称"></el-table-column>
+					<el-table-column prop="firstLevel" label="一级类型"></el-table-column>
+					<el-table-column prop="secondLevel" label="二级类型"></el-table-column>
+					<el-table-column prop="soldPrice" label="售价"></el-table-column>
+					<el-table-column prop="soldCount" label="已售（份）"></el-table-column>
+					<el-table-column prop="downloadCount" label="已下载（份）"></el-table-column>
+					<el-table-column prop="addTime" label="添加时间"></el-table-column>
 					<el-table-column prop="status" label="状态"></el-table-column>
-					<el-table-column prop="hasCount" label="已报名人数"></el-table-column>
-					<el-table-column prop="actStartTime" label="活动开始时间"></el-table-column>
 					<el-table-column label="操作" width="70px" fixed="right">
 						<template slot-scope="scope">
 							<div class="operation">
-								<div class="m1-margin-left-to-right" @click.stop="toDetail(scope.row.lectureNo)">
+								<div class="m1-margin-left-to-right" @click.stop="toDetail(scope.row.templateNo)">
 									查看
 								</div>
 							</div>
@@ -85,7 +94,7 @@
 
 <script>
 export default {
-	name: 'LectureList',
+	name: 'ContactList',
 	components: {},
 	data() {
 		return {
@@ -94,35 +103,60 @@ export default {
 				pageNum: 1,
 				pageSize: 10,
 				currStatus: '',
-				lectureName: '',
+				templateType: '',
+				templateName: '',
 			},
 			statusList: [
 				{
-					label: '未开始',
+					label: '显示',
 					value: 0,
 				},
 				{
-					label: '报名中',
+					label: '隐藏',
 					value: 1,
 				},
+			],
+			templateList: [
 				{
-					label: '截止报名',
-					value: 2,
+					value: 'a1',
+					label: '一级a',
+					children: [
+						{
+							value: 'a2',
+							label: '二级a1',
+						},
+						{
+							value: 'a3',
+							label: '二级a2',
+						},
+					],
 				},
 				{
-					label: '已结束',
-					value: 3,
+					value: 'b1',
+					label: '一级b',
+					children: [
+						{
+							value: 'b1',
+							label: '二级b1',
+						},
+						{
+							value: 'b2',
+							label: '二级b2',
+						},
+					],
 				},
 			],
 			tableData: [
 				{
-					lectureNo: '1200001',
-					lectureName: '讲座名称讲座名称',
-					sponsor: '小宇宙公司',
-					countPerson: 30,
-					status: '未开始',
-					hasCount: 12,
-					actStartTime: '2021.12.12 13:02',
+					templateNo: '1200001',
+					templateName: '讲座名称讲座名称',
+					firstLevel: '一级类型',
+					secondLevel: '二级类型',
+					soldPrice: '售价',
+					soldCount: 20,
+					downloadCount: 12,
+					addTime: '2021.12.08 12:02',
+					status: '显示',
 				},
 			],
 		}
@@ -131,14 +165,14 @@ export default {
 		this.getList()
 	},
 	methods: {
-		toDetail(lectureNo) {
+		toDetail(templateNo) {
 			this.$router.push({
-				path: `/lecture/detail?lectureNo=${lectureNo}`,
+				path: `/contract/detail?templateNo=${templateNo}`,
 			})
 		},
-		addLecture() {
+		addContract() {
 			this.$router.push({
-				path: '/lecture/add',
+				path: '/contract/add',
 			})
 		},
 		getList() {
@@ -156,7 +190,8 @@ export default {
 			this.getList()
 		},
 		handleRest() {
-			this.queryParams.lectureName = ''
+			this.queryParams.templateType = ''
+			this.queryParams.templateName = ''
 			this.queryParams.currStatus = ''
 			this.queryParams.pageNum = 1
 			this.getList()

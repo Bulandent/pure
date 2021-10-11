@@ -1,75 +1,63 @@
-
-
-
-
-
-
-
-
-
-
-
-
-.custom-flex{
-    display: flex;
-    align-items: center;
+.custom-flex {
+	display: flex;
+	align-items: center;
+}
+.m1-margin-top-to-bottom {
+	margin-bottom: 12px;
+}
+.m0-margin-bottom-to-top {
+	margin-top: 6px;
+}
+.m1-margin-bottom-to-top {
+	margin-top: 12px;
+}
+.m2-margin-bottom-to-top {
+	margin-top: 12px;
+}
+.m2-margin-top-to-bottom {
+	margin-bottom: 24px;
+}
+.m3-margin-top-to-bottom {
+	margin-bottom: 36px;
+}
+.m0-margin-right-to-left {
+	margin-left: 6px;
+}
+.m1-margin-right-to-left {
+	margin-left: 12px;
+}
+.m2-margin-right-to-left {
+	margin-left: 24px;
+}
+.p3-padding-bottom-to-top {
+	padding-top: 36px;
 }
 
-
-.m1-margin-top-to-bottom{
-    margin-bottom: 12px;
+.m1-margin-left-to-right {
+	margin-right: 12px;
 }
-.m0-margin-bottom-to-top{
-    margin-top: 6px;
+.m2-margin-left-to-right {
+	margin-right: 24px;
 }
-.m1-margin-bottom-to-top{
-    margin-top: 12px;
+.m1-padding-right-to-left {
+	padding-left: 12px;
 }
-.m2-margin-bottom-to-top{
-    margin-top: 12px;
+.m2-padding-right-to-left {
+	padding-left: 24px;
 }
-.m2-margin-top-to-bottom{
-    margin-bottom: 24px;
-}
-.m3-margin-top-to-bottom{
-    margin-bottom: 36px;
-}
-.m0-margin-right-to-left{
-    margin-left: 6px;
-}
-.m1-margin-right-to-left{
-    margin-left: 12px;
-}
-.m2-margin-right-to-left{
-    margin-left: 24px;
-}
-.p3-padding-bottom-to-top{
-    padding-top: 36px;
+.m2-padding-right-to-left {
+	padding-left: 24px;
 }
 
-.m1-margin-left-to-right{
-    margin-right: 12px;
+input[type='number'] {
+	-moz-appearance: textfield;
 }
-.m2-margin-left-to-right{
-    margin-right: 24px;
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
 }
-.m1-padding-right-to-left{
-    padding-left: 12px;
+.LayMent-table {
+	border: 1px solid #d7d7d7;
+	margin-top: 12px;
 }
-.m2-padding-right-to-left{
-    padding-left: 24px;
-}
-.m2-padding-right-to-left{
-    padding-left: 24px;
-}
-
-
-
-input[type="number"] {
-    -moz-appearance: textfield;
-  }
-  input[type="number"]::-webkit-inner-spin-button,
-  input[type="number"]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
