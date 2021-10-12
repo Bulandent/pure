@@ -19,6 +19,7 @@
 					<el-cascader
 						v-model="contractForm.templateType"
 						:options="templateList"
+						:disabled="isDisabled"
 						placeholder="模板类型"
 					></el-cascader>
 				</el-form-item>
@@ -37,7 +38,7 @@
 						:disabled="isDisabled"
 						:on-change="handleTemplateFileChange"
 						:show-file-list="false"
-						accept=".doc,.docx,.xlsx,.pptx"
+						:accept="templateAcceptFile"
 						:before-upload="beforeTemplateUpload"
 					>
 						<el-input
@@ -55,7 +56,7 @@
 						:disabled="isDisabled"
 						:on-change="handlePreviewFileChange"
 						:show-file-list="false"
-						accept=".pdf"
+						:accept="previewAcceptFile"
 						:before-upload="beforePreviewUpload"
 					>
 						<el-input
@@ -67,7 +68,7 @@
 					</el-upload>
 				</el-form-item>
 				<el-form-item label="售价" prop="soldPrice">
-					<el-col :span="21">
+					<el-col :span="22">
 						<el-input
 							type="text"
 							v-model="contractForm.soldPrice"
@@ -103,6 +104,8 @@ export default {
 			isDetail: false,
 			isRequesting: false,
 			isEdit: false,
+			templateAcceptFile: '.doc,.docx,.xlsx,.pptx',
+			previewAcceptFile: '.pdf',
 			contractForm: {
 				templateName: null,
 				templateType: null,
@@ -172,9 +175,11 @@ export default {
 	methods: {
 		handleTemplateFileChange(file, fileList) {
 			console.log(file, fileList)
+			this.contractForm.templateUrl = file.name
 		},
 		handlePreviewFileChange(file, fileList) {
 			console.log(file, fileList)
+			this.contractForm.previewUrl = file.name
 		},
 		getDetail() {
 			// 获取详情
@@ -205,30 +210,20 @@ export default {
 			this.$refs['contractForm'].resetFields()
 		},
 		beforeTemplateUpload(file) {
-			console.log(file)
-			const isJPG = file.type === 'image/jpeg'
-			const isLt2M = file.size / 1024 / 1024 < 2
-
-			if (!isJPG) {
-				this.$message.error('上传头像图片只能是 JPG 格式!')
+			const suffixs = /\.[^\.]+$/.exec(file.name)
+			if (!this.templateAcceptFile.includes(suffixs[0])) {
+				this.$message.warning(`限制上传 ${this.templateAcceptFile} 格式的图片`)
+				return false
 			}
-			if (!isLt2M) {
-				this.$message.error('上传头像图片大小不能超过 2MB!')
-			}
-			return isJPG && isLt2M
+			return true
 		},
 		beforePreviewUpload(file) {
-			console.log(file)
-			const isJPG = file.type === 'image/jpeg'
-			const isLt2M = file.size / 1024 / 1024 < 2
-
-			if (!isJPG) {
-				this.$message.error('上传头像图片只能是 JPG 格式!')
+			const suffixs = /\.[^\.]+$/.exec(file.name)
+			if (!this.previewAcceptFile.includes(suffixs[0])) {
+				this.$message.warning(`限制上传 ${this.previewAcceptFile} 格式的图片`)
+				return false
 			}
-			if (!isLt2M) {
-				this.$message.error('上传头像图片大小不能超过 2MB!')
-			}
-			return isJPG && isLt2M
+			return true
 		},
 	},
 }
@@ -236,26 +231,12 @@ export default {
 
 <style lang="scss" scoped>
 .contract-detail {
-	.ls-tips {
-		padding: 20px;
-		span {
-			color: #409eff;
-		}
-	}
-	.page-box {
-		text-align: center;
-		padding-top: 10px;
-	}
 	.contract-first {
 		position: relative;
-		padding-top: 20px;
+		padding-top: 40px;
 	}
-	.el-select {
+	.el-cascader {
 		width: 100%;
-	}
-	.el-form-item {
-		display: inline-block;
-		width: 50%;
 	}
 	.action-area {
 		padding-top: 50px;
@@ -264,39 +245,14 @@ export default {
 			margin-left: 30px;
 		}
 	}
-	.picture-uploader {
-		::v-deep {
-			.el-upload {
-				border: 1px solid #dcdfe6;
-				border-radius: 6px;
-				cursor: pointer;
-				position: relative;
-				overflow: hidden;
-			}
+	::v-deep {
+		.el-upload {
+			width: 100%;
 		}
-	}
-	.picture-uploader-icon {
-		font-size: 28px;
-		color: #8c939d;
-		width: 150px;
-		height: 150px;
-		line-height: 150px;
-		text-align: center;
-	}
-	.picture {
-		width: 150px;
-		height: 150px;
-		display: block;
 	}
 	::v-deep {
 		.el-tabs__item {
 			font-size: 16px;
-		}
-		.disabled-upload .el-upload {
-			background-color: #f5f7fa;
-			border-color: #e4e7ed;
-			color: #c0c4cc;
-			cursor: not-allowed;
 		}
 	}
 	.edit-btn {
