@@ -4,7 +4,7 @@ export const contract = [
 	{
 		path: '/contract',
 		component: Layout,
-		meta: { title: '', icon: 'service', noCache: true },
+		meta: { title: '内容管理', icon: 'service', noCache: true },
 		redirect: '/contract/list',
 		children: [
 			{
@@ -17,21 +17,19 @@ export const contract = [
 				path: 'list',
 				component: () => import('@/views/layout/menuIndex'),
 				name: 'contractList',
-				meta: { title: '合同模板', icon: 'service', noCache: true },
+				meta: { title: '合同模板2', icon: 'service', noCache: true },
 				hidden: true,
 				children: [
 					{
 						path: '/contract/add',
 						component: () => import('@/views/contract/detail'),
 						name: 'addcontract',
-						hidden: true,
 						meta: { title: '新增合同模板', icon: 'service', noCache: true },
 					},
 					{
 						path: '/contract/detail',
 						component: () => import('@/views/contract/detail'),
 						name: 'contractDetail',
-						hidden: true,
 						meta: { title: '合同模板详情', icon: 'service', noCache: true },
 					},
 				],
