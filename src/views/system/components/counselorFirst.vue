@@ -1,29 +1,80 @@
 <template>
 	<div class="counselor-first">
-		<el-form :model="firstForm" :rules="rules" ref="firstForm" label-width="120px">
-			<el-form-item label="服务类型" prop="serviceType">
-				<el-input
-					type="text"
-					v-model="firstForm.serviceType"
-					placeholder="请输入"
-					:disabled="!isEdit"
-				></el-input>
-			</el-form-item>
-			<el-form-item label="服务时长" prop="serviceDuration">
-				<div v-for="(item, index) in firstForm.serviceList" :key="index">
-					<el-button size="small" :class="{ on: item.on }" @click="item.on = true">
-						{{ item.label }}
-					</el-button>
-				</div>
-			</el-form-item>
-			<el-form-item label="价格" prop="price">
-				<div v-for="(item, index) in firstForm.serviceList" :key="index">
-					<template v-if="item.on">
-						<el-input type="text" v-model="item.price"></el-input>
-					</template>
-				</div>
-			</el-form-item>
-		</el-form>
+		<div v-for="(service, index) in serviceList" :key="index" class="service-item">
+			<el-form :model="serviceList[index]" :rules="rules" label-width="120px">
+				<el-form-item label="服务类型" prop="serviceType">
+					<el-input
+						type="text"
+						v-model="serviceList[index].serviceType"
+						placeholder="请输入"
+						:disabled="!isEdit"
+					></el-input>
+				</el-form-item>
+				<el-form-item label="服务时长" required="">
+					<div v-for="item in serviceList[index].timeList" :key="item.label" class="time-item">
+						<span :class="{ on: item.on }" @click="item.on = !item.on">
+							{{ item.label }}
+						</span>
+					</div>
+				</el-form-item>
+				<el-form-item label="价格" required>
+					<div v-for="(item, tIndex) in serviceList[index].timeList" :key="tIndex">
+						<template v-if="item.on">
+							<el-input type="text" v-model="item.price"></el-input>
+						</template>
+						元
+					</div>
+				</el-form-item>
+				<el-form-item label="服务内容" class="service-con" required>
+					<div class="tips">
+						已选择的服务时长含“年”，服务内容为1年服务次数，2年翻倍，以此类推，若未选择“年”则单位为“月”；输入-1为不限次数。
+					</div>
+					<div class="sc-item">
+						<span>线下咨询</span>
+						<div>
+							到甲方办公场所咨询
+							<el-input type="text" v-model="serviceList[index].firstPartyCount"></el-input>
+							次
+						</div>
+						<div>
+							到乙方办公场所咨询
+							<el-input type="text" v-model="serviceList[index].secondPartyCount"></el-input>
+							次
+						</div>
+					</div>
+					<div class="sc-item">
+						<span>线上咨询</span>
+						<div>
+							微信
+							<el-input type="text" v-model="serviceList[index].weixinCount"></el-input>
+							次
+						</div>
+						<div>
+							电话
+							<el-input type="text" v-model="serviceList[index].mobileCount"></el-input>
+							次
+						</div>
+					</div>
+					<div class="sc-item">
+						<span>合同/规章制度</span>
+						<div>
+							<span
+								v-for="contract in serviceList[index].contractList"
+								:class="{ on: contract.on }"
+								:key="contract.label"
+								@click="contract.on = !contract.on"
+							>
+								{{ contract.label }}
+							</span>
+						</div>
+						<div>
+							<el-input type="text" v-model="serviceList[index].contractCount"></el-input>
+							次
+						</div>
+					</div>
+				</el-form-item>
+			</el-form>
+		</div>
 		<div class="action-area" v-if="(isEdit && isDetail) || !isDetail">
 			<el-button type="primary" @click="submitForm">保存</el-button>
 			<el-button @click="goBack">返回</el-button>
@@ -177,4 +228,28 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.counselor-first {
+	.time-item {
+		display: inline-block;
+		span {
+			display: inline-block;
+			width: 70px;
+			border: 1px solid #dcdfe6;
+			cursor: pointer;
+			text-align: center;
+			font-weight: 400;
+			font-size: 12px;
+			line-height: 30px;
+			height: 30px;
+			border-radius: 4px;
+			transition: all 0.1;
+		}
+		span.on {
+			color: #1890ff;
+			background: #e8f4ff;
+			border-color: #a3d3ff;
+		}
+	}
+}
+</style>
