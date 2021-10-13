@@ -17,12 +17,15 @@
 						</span>
 					</div>
 				</el-form-item>
-				<el-form-item label="价格" required>
-					<div v-for="(item, tIndex) in serviceList[index].timeList" :key="tIndex">
+				<el-form-item label="价格（元）" required>
+					<div
+						v-for="(item, tIndex) in serviceList[index].timeList"
+						:key="tIndex"
+						class="time-item"
+					>
 						<template v-if="item.on">
-							<el-input type="text" v-model="item.price"></el-input>
+							<el-input type="text" v-model="serviceList[index].timeList[tIndex].price"></el-input>
 						</template>
-						元
 					</div>
 				</el-form-item>
 				<el-form-item label="服务内容" class="service-con" required>
@@ -96,24 +99,26 @@ export default {
 		return {
 			contractNo: '',
 			isRequesting: false,
-			firstForm: {
-				serviceType: null,
-				serviceList: [
-					{ label: '1个月', on: false, price: null },
-					{ label: '3个月', on: false, price: null },
-					{ label: '6个月', on: false, price: null },
-					{ label: '1年', on: false, price: null },
-					{ label: '2年', on: false, price: null },
-					{ label: '3年', on: false, price: null },
-					{ label: '4年', on: false, price: null },
-					{ label: '5年', on: false, price: null },
-				],
-				templateDesc: null,
-				templateUrl: null,
-				previewUrl: null,
-				soldPrice: null,
-				status: null,
-			},
+			serviceList: [
+				{
+					serviceType: null,
+					timeList: [
+						{ label: '1个月', on: false, price: null },
+						{ label: '3个月', on: false, price: null },
+						{ label: '6个月', on: false, price: null },
+						{ label: '1年', on: false, price: null },
+						{ label: '2年', on: false, price: null },
+						{ label: '3年', on: false, price: null },
+						{ label: '4年', on: false, price: null },
+						{ label: '5年', on: false, price: null },
+					],
+					templateDesc: null,
+					templateUrl: null,
+					previewUrl: null,
+					soldPrice: null,
+					status: null,
+				},
+			],
 			templateList: [
 				{
 					value: 'a1',
