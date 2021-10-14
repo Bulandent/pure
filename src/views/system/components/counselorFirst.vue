@@ -345,7 +345,6 @@ export default {
 
 <style lang="scss" scoped>
 .counselor-first {
-	padding: 0 100px 0 50px;
 	.service-item {
 		position: relative;
 	}

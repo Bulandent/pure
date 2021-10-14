@@ -72,19 +72,6 @@ export default {
 		this.getDetail()
 	},
 	methods: {
-		onEditorBlur(quill) {
-			console.log('editor blur!', quill)
-		},
-		onEditorFocus(quill) {
-			console.log('editor focus!', quill)
-		},
-		onEditorReady(quill) {
-			console.log('editor ready!', quill)
-		},
-		onEditorChange({ quill, html, text }) {
-			console.log('editor change!', quill, html, text)
-			this.content = html
-		},
 		getDetail() {
 			// 获取详情
 		},
@@ -108,6 +95,19 @@ export default {
 			this.isRequesting = true
 
 			console.log('接口提交中')
+		},
+		onEditorBlur(quill) {
+			console.log('editor blur!', quill)
+		},
+		onEditorFocus(quill) {
+			console.log('editor focus!', quill)
+		},
+		onEditorReady(quill) {
+			console.log('editor ready!', quill)
+		},
+		onEditorChange({ quill, html, text }) {
+			console.log('editor change!', quill, html, text)
+			this.content = html
 		},
 	},
 }

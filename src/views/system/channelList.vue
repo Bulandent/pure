@@ -2,31 +2,14 @@
 	<div class="accountManagement">
 		<div class="accMent-tab m1-margin-top-to-bottom">
 			<div></div>
-			<div class="AddLayMent" @click.stop="addContract">新增合同模板</div>
+			<div class="AddLayMent" @click.stop="toAdd">新增渠道类型</div>
 		</div>
 		<div class="LayMent-input m1-margin-top-to-bottom">
-			<div class="select-3 m1-margin-left-to-right">
-				<el-select v-model="queryParams.currStatus" placeholder="状态" class="select-default">
-					<el-option
-						v-for="item in statusList"
-						:key="item.value"
-						:label="item.label"
-						:value="item.value"
-					></el-option>
-				</el-select>
-			</div>
-			<div class="select-3 m1-margin-left-to-right">
-				<el-cascader
-					v-model="queryParams.templateType"
-					:options="templateList"
-					placeholder="模板类型"
-				></el-cascader>
-			</div>
 			<div class="search m1-margin-left-to-right">
 				<el-input
 					:clearable="true"
-					placeholder="搜索模板名称"
-					v-model="queryParams.templateName"
+					placeholder="搜索渠道类型"
+					v-model="queryParams.channelType"
 					class="input-with-select active-margin"
 				>
 					<el-button
@@ -56,21 +39,12 @@
 					"
 					style="width: 100%"
 				>
-					<el-table-column prop="templateNo" label="模板编号"></el-table-column>
-					<el-table-column prop="templateName" label="模板名称"></el-table-column>
-					<el-table-column prop="firstLevel" label="一级类型"></el-table-column>
-					<el-table-column prop="secondLevel" label="二级类型"></el-table-column>
-					<el-table-column prop="soldPrice" label="售价"></el-table-column>
-					<el-table-column prop="soldCount" label="已售（份）"></el-table-column>
-					<el-table-column prop="downloadCount" label="已下载（份）"></el-table-column>
-					<el-table-column prop="addTime" label="添加时间"></el-table-column>
-					<el-table-column prop="status" label="状态"></el-table-column>
+					<el-table-column prop="channelType" label="渠道类型"></el-table-column>
+					<el-table-column prop="editTime" label="最后编辑时间"></el-table-column>
 					<el-table-column label="操作" width="70px" fixed="right">
 						<template slot-scope="scope">
 							<div class="operation">
-								<div class="m1-margin-left-to-right" @click.stop="toDetail(scope.row.templateNo)">
-									查看
-								</div>
+								<div class="m1-margin-left-to-right" @click.stop="toDetail(scope.row.id)">查看</div>
 							</div>
 						</template>
 					</el-table-column>
@@ -94,69 +68,20 @@
 
 <script>
 export default {
-	name: 'ContactList',
-	components: {},
+	name: 'SystemChannelList',
 	data() {
 		return {
 			total: 0,
 			queryParams: {
 				pageNum: 1,
 				pageSize: 10,
-				currStatus: '',
-				templateType: '',
-				templateName: '',
+				channelType: '',
 			},
-			statusList: [
-				{
-					label: '显示',
-					value: 0,
-				},
-				{
-					label: '隐藏',
-					value: 1,
-				},
-			],
-			templateList: [
-				{
-					value: 'a1',
-					label: '一级a',
-					children: [
-						{
-							value: 'a2',
-							label: '二级a1',
-						},
-						{
-							value: 'a3',
-							label: '二级a2',
-						},
-					],
-				},
-				{
-					value: 'b1',
-					label: '一级b',
-					children: [
-						{
-							value: 'b1',
-							label: '二级b1',
-						},
-						{
-							value: 'b2',
-							label: '二级b2',
-						},
-					],
-				},
-			],
 			tableData: [
 				{
-					templateNo: '1200001',
-					templateName: '讲座名称讲座名称',
-					firstLevel: '一级类型',
-					secondLevel: '二级类型',
-					soldPrice: '售价',
-					soldCount: 20,
-					downloadCount: 12,
-					addTime: '2021.12.08 12:02',
-					status: '显示',
+					id: 1,
+					channelType: '标题标题',
+					editTime: '2021.12.08 12:02',
 				},
 			],
 		}
@@ -165,14 +90,14 @@ export default {
 		this.getList()
 	},
 	methods: {
-		toDetail(templateNo) {
+		toDetail(id) {
 			this.$router.push({
-				path: `/contract/detail?templateNo=${templateNo}`,
+				path: `/system/channelDetail?id=${id}`,
 			})
 		},
-		addContract() {
+		toAdd() {
 			this.$router.push({
-				path: '/contract/add',
+				path: `/system/addChannel`,
 			})
 		},
 		getList() {
@@ -190,9 +115,7 @@ export default {
 			this.getList()
 		},
 		handleRest() {
-			this.queryParams.templateType = ''
-			this.queryParams.templateName = ''
-			this.queryParams.currStatus = ''
+			this.queryParams.channelType = ''
 			this.queryParams.pageNum = 1
 			this.getList()
 		},

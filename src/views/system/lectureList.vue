@@ -2,31 +2,14 @@
 	<div class="accountManagement">
 		<div class="accMent-tab m1-margin-top-to-bottom">
 			<div></div>
-			<div class="AddLayMent" @click.stop="addContract">新增合同模板</div>
+			<div class="AddLayMent" @click.stop="toAdd">新增须知模板</div>
 		</div>
 		<div class="LayMent-input m1-margin-top-to-bottom">
-			<div class="select-3 m1-margin-left-to-right">
-				<el-select v-model="queryParams.currStatus" placeholder="状态" class="select-default">
-					<el-option
-						v-for="item in statusList"
-						:key="item.value"
-						:label="item.label"
-						:value="item.value"
-					></el-option>
-				</el-select>
-			</div>
-			<div class="select-3 m1-margin-left-to-right">
-				<el-cascader
-					v-model="queryParams.templateType"
-					:options="templateList"
-					placeholder="模板类型"
-				></el-cascader>
-			</div>
 			<div class="search m1-margin-left-to-right">
 				<el-input
 					:clearable="true"
-					placeholder="搜索模板名称"
-					v-model="queryParams.templateName"
+					placeholder="搜索名称、内容"
+					v-model="queryParams.lectureName"
 					class="input-with-select active-margin"
 				>
 					<el-button
@@ -56,21 +39,13 @@
 					"
 					style="width: 100%"
 				>
-					<el-table-column prop="templateNo" label="模板编号"></el-table-column>
-					<el-table-column prop="templateName" label="模板名称"></el-table-column>
-					<el-table-column prop="firstLevel" label="一级类型"></el-table-column>
-					<el-table-column prop="secondLevel" label="二级类型"></el-table-column>
-					<el-table-column prop="soldPrice" label="售价"></el-table-column>
-					<el-table-column prop="soldCount" label="已售（份）"></el-table-column>
-					<el-table-column prop="downloadCount" label="已下载（份）"></el-table-column>
-					<el-table-column prop="addTime" label="添加时间"></el-table-column>
-					<el-table-column prop="status" label="状态"></el-table-column>
+					<el-table-column prop="lectureName" label="须知名称"></el-table-column>
+					<el-table-column prop="lectureContent" label="须知内容"></el-table-column>
+					<el-table-column prop="editTime" label="最后编辑时间"></el-table-column>
 					<el-table-column label="操作" width="70px" fixed="right">
 						<template slot-scope="scope">
 							<div class="operation">
-								<div class="m1-margin-left-to-right" @click.stop="toDetail(scope.row.templateNo)">
-									查看
-								</div>
+								<div class="m1-margin-left-to-right" @click.stop="toEdit(scope.row)">编辑</div>
 							</div>
 						</template>
 					</el-table-column>
@@ -89,91 +64,83 @@
 				:total="total"
 			></el-pagination>
 		</div>
+
+		<ConfirmAdmin
+			:alert-data="Alert_Data"
+			v-if="showConfrim"
+			@submitForm="submitForm"
+			@closeForm="closeForm"
+		></ConfirmAdmin>
 	</div>
 </template>
 
 <script>
+import ConfirmAdmin from '@/components/confirm'
 export default {
-	name: 'ContactList',
-	components: {},
+	name: 'SystemLectureList',
+	components: {
+		ConfirmAdmin,
+	},
 	data() {
 		return {
 			total: 0,
 			queryParams: {
 				pageNum: 1,
 				pageSize: 10,
-				currStatus: '',
-				templateType: '',
-				templateName: '',
+				lectureName: '',
 			},
-			statusList: [
-				{
-					label: '显示',
-					value: 0,
-				},
-				{
-					label: '隐藏',
-					value: 1,
-				},
-			],
-			templateList: [
-				{
-					value: 'a1',
-					label: '一级a',
-					children: [
-						{
-							value: 'a2',
-							label: '二级a1',
-						},
-						{
-							value: 'a3',
-							label: '二级a2',
-						},
-					],
-				},
-				{
-					value: 'b1',
-					label: '一级b',
-					children: [
-						{
-							value: 'b1',
-							label: '二级b1',
-						},
-						{
-							value: 'b2',
-							label: '二级b2',
-						},
-					],
-				},
-			],
 			tableData: [
 				{
-					templateNo: '1200001',
-					templateName: '讲座名称讲座名称',
-					firstLevel: '一级类型',
-					secondLevel: '二级类型',
-					soldPrice: '售价',
-					soldCount: 20,
-					downloadCount: 12,
-					addTime: '2021.12.08 12:02',
-					status: '显示',
+					lectureName: '标题标题',
+					lectureContent: '内容内容',
+					editTime: '2021.12.08 12:02',
 				},
 			],
+			showConfrim: false,
+			Alert_Data: {
+				title: '新增须知模板',
+				centerDialogVisible: true,
+				showPrepend: false,
+				ruleForm: {
+					lectureName: '',
+					lectureContent: '',
+				},
+				type: 1,
+				region: '',
+				rules: {
+					lectureName: [{ required: true, message: '请输入', trigger: 'blur' }],
+					lectureContent: [{ required: true, message: '请输入', trigger: 'blur' }],
+				},
+				input: [
+					{ lable: '须知名称:', prop: 'lectureName', text: '请输入', val: '' },
+					{ lable: '须知内容:', prop: 'lectureContent', text: '请输入', val: '', type: 'textare' },
+				],
+			},
 		}
 	},
 	created() {
 		this.getList()
 	},
 	methods: {
-		toDetail(templateNo) {
-			this.$router.push({
-				path: `/contract/detail?templateNo=${templateNo}`,
-			})
+		submitForm() {
+			this.showConfrim = false
+			console.log('提交成功')
 		},
-		addContract() {
-			this.$router.push({
-				path: '/contract/add',
-			})
+		closeForm() {
+			this.showConfrim = false
+		},
+		toEdit(row) {
+			const { lectureName, lectureContent } = row
+			this.Alert_Data.title = '编辑须知模板'
+			this.Alert_Data.ruleForm.lectureName = lectureName
+			this.Alert_Data.ruleForm.lectureContent = lectureContent
+			this.showConfrim = true
+		},
+		toAdd() {
+			this.Alert_Data.title = '新增须知模板'
+			this.Alert_Data.ruleForm.lectureName = ''
+			this.Alert_Data.ruleForm.lectureContent = ''
+			this.showConfrim = true
 		},
 		getList() {
 			// 请求列表
@@ -190,9 +157,7 @@ export default {
 			this.getList()
 		},
 		handleRest() {
-			this.queryParams.templateType = ''
-			this.queryParams.templateName = ''
-			this.queryParams.currStatus = ''
+			this.queryParams.lectureName = ''
 			this.queryParams.pageNum = 1
 			this.getList()
 		},

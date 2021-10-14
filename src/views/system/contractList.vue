@@ -1,54 +1,19 @@
 <template>
 	<div class="accountManagement">
 		<div class="accMent-tab m1-margin-top-to-bottom">
-			<div></div>
-			<div class="AddLayMent" @click.stop="addContract">新增合同模板</div>
-		</div>
-		<div class="LayMent-input m1-margin-top-to-bottom">
-			<div class="select-3 m1-margin-left-to-right">
-				<el-select v-model="queryParams.currStatus" placeholder="状态" class="select-default">
-					<el-option
-						v-for="item in statusList"
-						:key="item.value"
-						:label="item.label"
-						:value="item.value"
-					></el-option>
-				</el-select>
-			</div>
-			<div class="select-3 m1-margin-left-to-right">
-				<el-cascader
-					v-model="queryParams.templateType"
-					:options="templateList"
-					placeholder="模板类型"
-				></el-cascader>
-			</div>
-			<div class="search m1-margin-left-to-right">
-				<el-input
-					:clearable="true"
-					placeholder="搜索模板名称"
-					v-model="queryParams.templateName"
-					class="input-with-select active-margin"
-				>
-					<el-button
-						slot="append"
-						icon="el-icon-search"
-						class="search-icon"
-						@click.stop="search"
-					></el-button>
-				</el-input>
-			</div>
-			<div class="custom-flex m1-margin-left-to-right">
-				<el-button @click.stop="search">搜索</el-button>
-			</div>
-			<div class="custom-flex rester m1-margin-left-to-right">
-				<el-button @click.stop="handleRest">重置</el-button>
-			</div>
+			<el-tabs v-model="queryParams.tabActive" type="card" @tab-click="handleClick">
+				<el-tab-pane label="个人" name="first"></el-tab-pane>
+				<el-tab-pane label="企业" name="second"></el-tab-pane>
+			</el-tabs>
+			<div class="AddLayMent" @click.stop="addContract">新增合同分类</div>
 		</div>
 		<div class="LayMent-table m1-margin-top-to-bottom">
 			<div class="healthName">
 				<el-table
 					:data="tableData"
 					header-row-class-name="updatecolumn"
+					:tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
+					row-key="id"
 					:header-row-style="
 						() => {
 							return 'color:black;font-size:15px'
@@ -56,21 +21,15 @@
 					"
 					style="width: 100%"
 				>
-					<el-table-column prop="templateNo" label="模板编号"></el-table-column>
-					<el-table-column prop="templateName" label="模板名称"></el-table-column>
-					<el-table-column prop="firstLevel" label="一级类型"></el-table-column>
-					<el-table-column prop="secondLevel" label="二级类型"></el-table-column>
-					<el-table-column prop="soldPrice" label="售价"></el-table-column>
-					<el-table-column prop="soldCount" label="已售（份）"></el-table-column>
-					<el-table-column prop="downloadCount" label="已下载（份）"></el-table-column>
-					<el-table-column prop="addTime" label="添加时间"></el-table-column>
-					<el-table-column prop="status" label="状态"></el-table-column>
-					<el-table-column label="操作" width="70px" fixed="right">
+					<el-table-column prop="firstName" label="分类名称"></el-table-column>
+					<el-table-column prop="secondName" label="二级分类名称"></el-table-column>
+					<el-table-column prop="secondCount" label="二级分类数（个）"></el-table-column>
+					<el-table-column prop="hasCount" label="所属合同模板（个）"></el-table-column>
+					<el-table-column label="操作" width="140px" fixed="right">
 						<template slot-scope="scope">
 							<div class="operation">
-								<div class="m1-margin-left-to-right" @click.stop="toDetail(scope.row.templateNo)">
-									查看
-								</div>
+								<div class="m1-margin-left-to-right" @click.stop="toEdit(scope.row)">编辑</div>
+								<div class="m1-margin-left-to-right" @click.stop="toDelete(scope.row)">删除</div>
 							</div>
 						</template>
 					</el-table-column>
@@ -89,97 +48,126 @@
 				:total="total"
 			></el-pagination>
 		</div>
+
+		<ConfirmAdmin
+			:alert-data="Alert_Data"
+			v-if="showConfrim"
+			@submitForm="submitForm"
+			@closeForm="closeForm"
+		></ConfirmAdmin>
 	</div>
 </template>
 
 <script>
+import ConfirmAdmin from '@/components/confirm'
 export default {
 	name: 'ContactList',
-	components: {},
+	components: {
+		ConfirmAdmin,
+	},
 	data() {
 		return {
 			total: 0,
 			queryParams: {
 				pageNum: 1,
 				pageSize: 10,
-				currStatus: '',
-				templateType: '',
-				templateName: '',
+				tabActive: 'first',
 			},
-			statusList: [
-				{
-					label: '显示',
-					value: 0,
-				},
-				{
-					label: '隐藏',
-					value: 1,
-				},
-			],
-			templateList: [
-				{
-					value: 'a1',
-					label: '一级a',
-					children: [
-						{
-							value: 'a2',
-							label: '二级a1',
-						},
-						{
-							value: 'a3',
-							label: '二级a2',
-						},
-					],
-				},
-				{
-					value: 'b1',
-					label: '一级b',
-					children: [
-						{
-							value: 'b1',
-							label: '二级b1',
-						},
-						{
-							value: 'b2',
-							label: '二级b2',
-						},
-					],
-				},
-			],
 			tableData: [
 				{
-					templateNo: '1200001',
-					templateName: '讲座名称讲座名称',
-					firstLevel: '一级类型',
-					secondLevel: '二级类型',
-					soldPrice: '售价',
-					soldCount: 20,
-					downloadCount: 12,
-					addTime: '2021.12.08 12:02',
-					status: '显示',
+					id: 1,
+					firstName: '饮料',
+					secondName: null,
+					secondCount: 20,
+					hasCount: 18,
+					children: [
+						{
+							id: 2,
+							firstName: null,
+							secondName: '矿泉水',
+							secondCount: null,
+							hasCount: 18,
+						},
+						{
+							id: 3,
+							firstName: null,
+							secondName: '脉动',
+							secondCount: null,
+							hasCount: 4,
+						},
+					],
+				},
+				{
+					id: 4,
+					firstName: '蔬菜',
+					secondName: null,
+					secondCount: '12',
+					hasCount: 10,
+				},
+				{
+					id: 5,
+					firstName: '肉类',
+					secondName: '',
+					secondCount: '12',
+					hasCount: 10,
+					children: [
+						{
+							id: 6,
+							firstName: null,
+							secondName: '猪肉',
+							secondCount: null,
+							hasCount: 10,
+						},
+						{
+							id: 7,
+							firstName: null,
+							secondName: '鸡肉',
+							secondCount: 18,
+							hasCount: 10,
+						},
+					],
 				},
 			],
+			showConfrim: false,
+			Alert_Data: {
+				title: '新增回访客户',
+				centerDialogVisible: true,
+				showPrepend: false,
+				ruleForm: {
+					name: '',
+					type: '',
+					mobile: '',
+				},
+				type: 1,
+				region: '',
+				rules: {
+					name: [{ required: true, message: '请输入', trigger: 'blur' }],
+					type: [{ required: true, message: '请选择', trigger: 'change' }],
+					// mobile: [
+					// 	{ validator: validatorUserIphone, required: true, message: '请输入', trigger: 'blur' },
+					// ],
+				},
+				input: [
+					{ lable: '客户名:', prop: 'name', text: '请输入', val: '' },
+					{ lable: '客户类型:', prop: 'type', text: '请输入', val: '', select: [] },
+					{ lable: '手机号:', prop: 'mobile', text: '请输入', val: '' },
+				],
+			},
 		}
 	},
 	created() {
 		this.getList()
 	},
 	methods: {
-		toDetail(templateNo) {
-			this.$router.push({
-				path: `/contract/detail?templateNo=${templateNo}`,
-			})
-		},
 		addContract() {
-			this.$router.push({
-				path: '/contract/add',
-			})
+			this.showConfrim = true
+		},
+		toEdit(row) {},
+		handleClick(tab, event) {
+			console.log(tab)
 		},
 		getList() {
 			// 请求列表
-		},
-		search() {
-			this.getList()
 		},
 		handleSizeChange(pageSize) {
 			this.queryParams.pageSize = pageSize
@@ -187,13 +175,6 @@ export default {
 		},
 		currentChange(pageNum) {
 			this.queryParams.pageNum = pageNum
-			this.getList()
-		},
-		handleRest() {
-			this.queryParams.templateType = ''
-			this.queryParams.templateName = ''
-			this.queryParams.currStatus = ''
-			this.queryParams.pageNum = 1
 			this.getList()
 		},
 	},
@@ -341,6 +322,14 @@ export default {
 	}
 	.LayMent-pages {
 		text-align: center;
+	}
+	.el-tabs {
+		::v-deep {
+			.is-active {
+				background-color: #1989fa;
+				color: #fff;
+			}
+		}
 	}
 }
 </style>

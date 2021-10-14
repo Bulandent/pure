@@ -1,271 +1,206 @@
 <template>
-	<div class="contract-detail">
-		<el-tabs v-model="activeTab">
-			<el-tab-pane label="服务设置" name="first"></el-tab-pane>
-			<el-tab-pane label="服务说明" name="second"></el-tab-pane>
-			<el-tab-pane label="可选包" name="third"></el-tab-pane>
-		</el-tabs>
-		<div class="contract-first">
-			<div v-if="isDisabled" class="edit-btn">
-				<i @click="isEdit = !isEdit" class="el-icon-edit-outline"></i>
+	<div class="counselor-third">
+		<div v-for="(item, index) in packageList" :key="index" class="package-item">
+			<div class="package-index">{{ index + 1 }}</div>
+			<div class="package-delete" v-if="packageList.length > 1">
+				<i class="el-icon-delete" @click="removePackage(index)"></i>
 			</div>
-			<el-form :model="contractForm" :rules="rules" ref="contractForm" label-width="120px">
-				<el-form-item label="模板名称" prop="templateName">
-					<el-input
-						type="text"
-						v-model="contractForm.templateName"
-						:disabled="isDisabled"
-					></el-input>
-				</el-form-item>
-				<el-form-item label="模板类型" prop="templateType">
-					<el-cascader
-						v-model="contractForm.templateType"
-						:options="templateList"
-						:disabled="isDisabled"
-						placeholder="模板类型"
-					></el-cascader>
-				</el-form-item>
-				<el-form-item label="模板简介" prop="templateDesc">
-					<el-input
-						type="text"
-						v-model="contractForm.templateDesc"
-						:disabled="isDisabled"
-						maxlength="80"
-					></el-input>
-				</el-form-item>
-				<el-form-item label="模板文件" prop="templateUrl">
-					<el-upload
-						class="upload-demo"
-						action=""
-						:disabled="isDisabled"
-						:on-change="handleTemplateFileChange"
-						:show-file-list="false"
-						:accept="templateAcceptFile"
-						:before-upload="beforeTemplateUpload"
-					>
-						<el-input
-							type="text"
-							v-model="contractForm.templateUrl"
-							:disabled="isDisabled"
-							placeholder="点击上传"
-						></el-input>
-					</el-upload>
-				</el-form-item>
-				<el-form-item label="预览文件" prop="previewUrl">
-					<el-upload
-						class="upload-demo"
-						action=""
-						:disabled="isDisabled"
-						:on-change="handlePreviewFileChange"
-						:show-file-list="false"
-						:accept="previewAcceptFile"
-						:before-upload="beforePreviewUpload"
-					>
-						<el-input
-							type="text"
-							v-model="contractForm.previewUrl"
-							:disabled="isDisabled"
-							placeholder="点击上传"
-						></el-input>
-					</el-upload>
-				</el-form-item>
-				<el-form-item label="售价" prop="soldPrice">
-					<el-col :span="22">
-						<el-input
-							type="text"
-							v-model="contractForm.soldPrice"
-							:disabled="isDisabled"
-						></el-input>
+			<el-form :model="packageList[index]" :rules="rules" ref="thirdForm" label-width="100px">
+				<el-row>
+					<el-col :span="11">
+						<el-form-item label="可选包名称" prop="packageName">
+							<el-input
+								type="text"
+								v-model="packageList[index].packageName"
+								placeholder="请输入"
+								:disabled="!isEdit"
+							></el-input>
+						</el-form-item>
 					</el-col>
-					<el-col :span="2" style="text-align: right">元</el-col>
+					<el-col :span="11" :offset="2">
+						<el-form-item label="价格" prop="packagePrice">
+							<el-input
+								type="text"
+								v-model="packageList[index].packagePrice"
+								placeholder="请输入：0为面谈"
+								:disabled="!isEdit"
+							></el-input>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<el-form-item label="简介" prop="packageDesc">
+					<el-input
+						type="text"
+						v-model="packageList[index].packageDesc"
+						placeholder="请输入"
+						:disabled="!isEdit"
+					></el-input>
 				</el-form-item>
-				<el-form-item label="状态" prop="status">
-					<el-switch
-						v-model="contractForm.status"
-						:disabled="isDisabled"
-						active-text="开启"
-					></el-switch>
+				<el-form-item label="可选包说明" required>
+					<quill-editor
+						ref="myQuillEditor"
+						v-model="packageList[index].packageInfo"
+						:options="editorOption"
+						:disabled="!isEdit"
+						@blur="onEditorBlur($event)"
+						@focus="onEditorFocus($event)"
+						@ready="onEditorReady($event)"
+					/>
 				</el-form-item>
 			</el-form>
-			<div class="action-area" v-if="(isEdit && isDetail) || !isDetail">
-				<el-button type="primary" @click="submitForm">保存</el-button>
-				<el-button @click="goBack">返回</el-button>
-			</div>
+		</div>
+		<div class="add-package" v-if="isEdit">
+			<el-button @click="addPackage" icon="el-icon-plus">添加服务类型</el-button>
+		</div>
+		<div class="action-area" v-if="isEdit">
+			<el-button type="primary" @click="submitForm">保存</el-button>
+			<el-button @click="goBack">返回</el-button>
 		</div>
 	</div>
 </template>
 
 <script>
+// https://github.com/surmon-china/vue-quill-editor
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
+import { quillEditor } from 'vue-quill-editor'
 export default {
-	name: 'ContractDetail',
-	components: {},
+	name: 'CounselorThird',
+	components: {
+		quillEditor,
+	},
+	props: {
+		isEdit: {
+			type: Boolean,
+			default: () => false,
+		},
+	},
 	data() {
 		return {
-			contractNo: '',
-			activeTab: 'first',
-			isDetail: false,
-			isRequesting: false,
-			isEdit: false,
-			templateAcceptFile: '.doc,.docx,.xlsx,.pptx',
-			previewAcceptFile: '.pdf',
-			contractForm: {
-				templateName: null,
-				templateType: null,
-				templateDesc: null,
-				templateUrl: null,
-				previewUrl: null,
-				soldPrice: null,
-				status: null,
-			},
-			templateList: [
+			packageList: [
 				{
-					value: 'a1',
-					label: '一级a',
-					children: [
-						{
-							value: 'a2',
-							label: '二级a1',
-						},
-						{
-							value: 'a3',
-							label: '二级a2',
-						},
-					],
-				},
-				{
-					value: 'b1',
-					label: '一级b',
-					children: [
-						{
-							value: 'b1',
-							label: '二级b1',
-						},
-						{
-							value: 'b2',
-							label: '二级b2',
-						},
-					],
+					packageName: null,
+					packagePrice: null,
+					packageDesc: null,
+					packageInfo: null,
 				},
 			],
+			isRequesting: false,
+			editorOption: {},
 			rules: {
-				templateName: [{ required: true, message: '必填', trigger: 'blur' }],
-				templateType: [{ required: true, message: '必填', trigger: 'change' }],
-				templateDesc: [{ required: true, message: '必填', trigger: 'blur' }],
-				templateUrl: [{ required: true, message: '必填', trigger: 'change' }],
-				previewUrl: [{ required: true, message: '必填', trigger: 'change' }],
-				status: [{ required: true, message: '必填', trigger: 'change' }],
-				soldPrice: [
+				packageName: [{ required: true, message: '必填', trigger: 'blur' }],
+				packagePrice: [
 					{ required: true, message: '必填', trigger: 'blur' },
 					{ pattern: /(?:^[0-9]$)|(?:^[1-9][0-9]+$)/, message: '格式不正确', trigger: 'blur' },
 				],
+				packageDesc: [{ required: true, message: '必填', trigger: 'blur' }],
 			},
 		}
 	},
-	computed: {
-		isDisabled() {
-			return this.isDetail && !this.isEdit
-		},
-	},
 	created() {
-		this.isDetail = this.$route.path.includes('detail')
-		if (this.isDetail) {
-			this.contractNo = this.$route.query.contractNo
-			this.getDetail()
-			this.getApplyList()
-		}
+		this.getDetail()
 	},
 	methods: {
-		handleTemplateFileChange(file, fileList) {
-			console.log(file, fileList)
-			this.contractForm.templateUrl = file.name
+		addPackage() {
+			const p = {
+				packageName: null,
+				packagePrice: null,
+				packageDesc: null,
+				packageInfo: null,
+			}
+			this.packageList.push(p)
 		},
-		handlePreviewFileChange(file, fileList) {
-			console.log(file, fileList)
-			this.contractForm.previewUrl = file.name
+		removePackage(index) {
+			this.packageList.splice(index, 1)
 		},
 		getDetail() {
 			// 获取详情
 		},
-		getApplyList() {
-			// 获取报名列表
-		},
 		goBack() {
 			this.$router.push({
-				path: '/contract/list',
+				path: '/system/counselorList',
 			})
 		},
 		submitForm() {
+			let flag = true
+
+			for (let index = 0; index < this.packageList.length; index++) {
+				this.$refs.thirdForm[index].validate(valid => {
+					if (!valid) flag = false
+				})
+				if (!flag) return
+
+				if (!this.packageList[index].packageInfo) {
+					this.$message.warning('可选包说明不能为空')
+					return
+				}
+			}
+
 			if (this.isRequesting) return
 			this.isRequesting = true
 
-			let flag = true
-			this.$refs['contractForm'].validate(valid => {
-				if (!valid) {
-					flag = false
-				}
-			})
-			if (!flag) return
-
 			console.log('接口提交中')
 		},
-		resetForm() {
-			this.$refs['contractForm'].resetFields()
+		onEditorBlur(quill) {
+			console.log('editor blur!', quill)
 		},
-		beforeTemplateUpload(file) {
-			const suffixs = /\.[^\.]+$/.exec(file.name)
-			if (!this.templateAcceptFile.includes(suffixs[0])) {
-				this.$message.warning(`限制上传 ${this.templateAcceptFile} 格式的图片`)
-				return false
-			}
-			return true
+		onEditorFocus(quill) {
+			console.log('editor focus!', quill)
 		},
-		beforePreviewUpload(file) {
-			const suffixs = /\.[^\.]+$/.exec(file.name)
-			if (!this.previewAcceptFile.includes(suffixs[0])) {
-				this.$message.warning(`限制上传 ${this.previewAcceptFile} 格式的图片`)
-				return false
-			}
-			return true
+		onEditorReady(quill) {
+			console.log('editor ready!', quill)
+		},
+		onEditorChange({ quill, html, text }) {
+			console.log('editor change!', quill, html, text)
+			this.content = html
 		},
 	},
 }
 </script>
 
 <style lang="scss" scoped>
-.contract-detail {
-	.contract-first {
-		position: relative;
-		padding-top: 40px;
-	}
-	.el-cascader {
-		width: 100%;
-	}
-	.action-area {
-		padding-top: 50px;
-		text-align: center;
-		button + button {
-			margin-left: 30px;
-		}
-	}
-	::v-deep {
-		.el-upload {
-			width: 100%;
-		}
-	}
-	::v-deep {
-		.el-tabs__item {
-			font-size: 16px;
-		}
-	}
-	.edit-btn {
+.package-item {
+	position: relative;
+	.package-index {
 		position: absolute;
-		right: 0;
+		left: -30px;
 		top: 0;
-		.el-icon-edit-outline {
-			cursor: pointer;
+		width: 30px;
+		height: 30px;
+		line-height: 30px;
+		border: 1px solid #409eff;
+		border-radius: 50px;
+		color: #409eff;
+		text-align: center;
+	}
+	.package-delete {
+		position: absolute;
+		right: -50px;
+		top: 0;
+		i {
 			font-size: 30px;
+			cursor: pointer;
 			color: #409eff;
 		}
 	}
+}
+.add-package {
+	text-align: center;
+	margin: 30px 0;
+	.el-button {
+		width: 300px;
+	}
+}
+.quill-editor {
+	::v-deep {
+		.ql-container {
+			height: 250px;
+		}
+	}
+}
+.action-area {
+	text-align: center;
+	margin-top: 50px;
 }
 </style>

@@ -51,7 +51,7 @@ export default {
 .counselor-detail {
 	.counselor-content {
 		position: relative;
-		padding-top: 40px;
+		padding: 40px 100px 0 50px;
 	}
 	.edit-btn {
 		position: absolute;
