@@ -53,7 +53,7 @@
 			:alert-data="Alert_Data"
 			v-if="showConfrim"
 			@submitForm="submitForm"
-			@closeForm="closeForm"
+			@closeForm="showConfrim = false"
 		></ConfirmAdmin>
 	</div>
 </template>
@@ -130,27 +130,55 @@ export default {
 			],
 			showConfrim: false,
 			Alert_Data: {
-				title: '新增回访客户',
+				title: '新增模板分类',
 				centerDialogVisible: true,
 				showPrepend: false,
 				ruleForm: {
-					name: '',
-					type: '',
-					mobile: '',
+					typeLevel: '',
+					typeOf: '',
+					typeName: '',
 				},
 				type: 1,
 				region: '',
 				rules: {
-					name: [{ required: true, message: '请输入', trigger: 'blur' }],
-					type: [{ required: true, message: '请选择', trigger: 'change' }],
-					// mobile: [
-					// 	{ validator: validatorUserIphone, required: true, message: '请输入', trigger: 'blur' },
-					// ],
+					typeLevel: [{ required: true, message: '请输入', trigger: 'change' }],
+					typeOf: [{ required: true, message: '请选择', trigger: 'change' }],
+					typeName: [{ required: true, message: '请选择', trigger: 'blur' }],
 				},
 				input: [
-					{ lable: '客户名:', prop: 'name', text: '请输入', val: '' },
-					{ lable: '客户类型:', prop: 'type', text: '请输入', val: '', select: [] },
-					{ lable: '手机号:', prop: 'mobile', text: '请输入', val: '' },
+					{
+						lable: '分类等级:',
+						prop: 'typeLevel',
+						text: '请输入',
+						val: '',
+						select: [
+							{
+								label: '一级分类',
+								value: 1,
+							},
+							{
+								label: '二级分类',
+								value: 2,
+							},
+						],
+					},
+					{
+						lable: '所属分类:',
+						prop: 'typeOf',
+						text: '请选择',
+						val: '',
+						select: [
+							{
+								label: '一级分类',
+								value: 1,
+							},
+							{
+								label: '二级分类',
+								value: 2,
+							},
+						],
+					},
+					{ lable: '分类名称:', prop: 'typeName', text: '请输入', val: '' },
 				],
 			},
 		}
@@ -159,10 +187,28 @@ export default {
 		this.getList()
 	},
 	methods: {
+		submitForm() {
+			console.log('submit')
+		},
 		addContract() {
+			this.Alert_Data.title = '新增模板分类'
 			this.showConfrim = true
 		},
-		toEdit(row) {},
+		toEdit(row) {
+			const { firstName, secondName } = row
+			this.Alert_Data.title = '编辑模板分类'
+			this.Alert_Data.ruleForm.typeLevel = secondName ? 2 : 1
+			this.Alert_Data.ruleForm.typeOf = secondName ? 2 : 1
+			this.Alert_Data.ruleForm.typeName = firstName ? firstName : secondName
+			this.showConfrim = true
+		},
+		toDelete(row) {
+			if (row.children && row.children.length > 0) {
+				console.log('存在下级分类，不允许删除')
+				this.$message.warning('存在下级分类，不允许删除')
+			}
+			this.$message.success('删除成功')
+		},
 		handleClick(tab, event) {
 			console.log(tab)
 		},
