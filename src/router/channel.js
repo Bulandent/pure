@@ -21,8 +21,14 @@ export const channel = [
 				hidden: true,
 				children: [
 					{
-						path: '/channel/add',
-						component: () => import('@/views/channel/add'),
+						path: '/channel/addChannel',
+						component: () => import('@/views/channel/detail'),
+						name: 'addChannel',
+						meta: { title: '新增渠道', icon: 'service', noCache: true },
+					},
+					{
+						path: '/channel/addSubChannel',
+						component: () => import('@/views/channel/detail'),
 						name: 'addChannel',
 						meta: { title: '新增渠道', icon: 'service', noCache: true },
 					},

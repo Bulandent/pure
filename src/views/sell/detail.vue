@@ -1,17 +1,14 @@
 <template>
-	<div class="channel-detail">
+	<div class="sell-detail">
 		<el-tabs v-model="activeTab">
-			<el-tab-pane label="渠道信息" name="first"></el-tab-pane>
-			<template v-if="isDetail">
-				<el-tab-pane label="下属渠道" name="second"></el-tab-pane>
-				<el-tab-pane label="邀请记录" name="third"></el-tab-pane>
-				<el-tab-pane label="客户下单记录" name="four"></el-tab-pane>
-				<el-tab-pane label="分润记录" name="five"></el-tab-pane>
-			</template>
+			<el-tab-pane label="销售信息" name="first"></el-tab-pane>
+			<el-tab-pane label="邀请记录" name="third"></el-tab-pane>
+			<el-tab-pane label="客户下单记录" name="four"></el-tab-pane>
+			<el-tab-pane label="提成记录" name="five"></el-tab-pane>
 		</el-tabs>
-		<div class="channel-content">
+		<div class="sell-content">
 			<div v-show="activeTab === 'first'">
-				<div v-if="isDetail" class="channel-statistics">
+				<div class="sell-statistics">
 					<div class="cs-tab">
 						<span
 							v-for="(tab, index) in csTabList"
@@ -32,47 +29,39 @@
 						</div>
 					</div>
 				</div>
-				<channel-first :is-edit="isEdit"></channel-first>
+				<sell-first :is-edit="isEdit"></sell-first>
 			</div>
-			<template v-if="isDetail">
-				<div v-show="activeTab === 'second'">
-					<channel-second :is-edit="isEdit"></channel-second>
-				</div>
-				<div v-show="activeTab === 'third'">
-					<channel-third :is-edit="isEdit"></channel-third>
-				</div>
-				<div v-show="activeTab === 'four'">
-					<channel-four :is-edit="isEdit"></channel-four>
-				</div>
-				<div v-show="activeTab === 'five'">
-					<channel-five :is-edit="isEdit"></channel-five>
-				</div>
-			</template>
+			<div v-show="activeTab === 'third'">
+				<sell-third :is-edit="isEdit"></sell-third>
+			</div>
+			<div v-show="activeTab === 'four'">
+				<sell-four :is-edit="isEdit"></sell-four>
+			</div>
+			<div v-show="activeTab === 'five'">
+				<sell-five :is-edit="isEdit"></sell-five>
+			</div>
 		</div>
 	</div>
 </template>
 
 <script>
-import channelFirst from './components/channelFirst.vue'
-import channelSecond from './components/channelSecond.vue'
-import channelThird from './components/channelThird.vue'
-import channelFour from './components/channelFour.vue'
-import channelFive from './components/channelFive.vue'
+import sellFirst from './components/sellFirst.vue'
+import sellThird from './components/sellThird.vue'
+import sellFour from './components/sellFour.vue'
+import sellFive from './components/sellFive.vue'
 export default {
 	name: 'ChannelDetail',
 	components: {
-		channelFirst,
-		channelSecond,
-		channelThird,
-		channelFour,
-		channelFive,
+		sellFirst,
+		sellThird,
+		sellFour,
+		sellFive,
 	},
 	data() {
 		return {
-			channelNo: '',
+			sellNo: '',
 			activeTab: 'first',
 			isEdit: false,
-			isDetail: false,
 			currIndex: 0,
 			csTabList: [
 				{ label: '全部', value: 1 },
@@ -87,15 +76,10 @@ export default {
 				{ label: '新用户注册数', value: 10, suffix: '个' },
 				{ label: '企业顾问下单数', value: 10, suffix: '个' },
 				{ label: '个人顾问下单数', value: 10, suffix: '个' },
-				{ label: '累计佣金', value: 10, suffix: '元' },
-				{ label: '待结算佣金', value: 10, suffix: '元' },
-				{ label: '已结算佣金', value: 10, suffix: '元' },
 			],
 		}
 	},
-	created() {
-		this.isDetail = this.$route.path.includes('detail')
-	},
+	created() {},
 	methods: {
 		changeCsTab(index) {
 			if (index === this.currIndex) return
@@ -106,8 +90,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.channel-detail {
-	.channel-content {
+.sell-detail {
+	.sell-content {
 		position: relative;
 		padding: 30px 100px 0 50px;
 	}
@@ -128,7 +112,7 @@ export default {
 			margin-left: 30px;
 		}
 	}
-	.channel-statistics {
+	.sell-statistics {
 		padding-bottom: 20px;
 		.cs-tab {
 			text-align: center;
@@ -145,7 +129,7 @@ export default {
 		.cs-con {
 			display: flex;
 			margin: 0 auto;
-			width: 700px;
+			width: 400px;
 			text-align: center;
 			justify-content: center;
 			border-radius: 20px;

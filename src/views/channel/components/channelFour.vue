@@ -1,49 +1,58 @@
 <template>
-	<div class="accountManagement">
-		<div class="accMent-tab m1-margin-top-to-bottom">
-			<el-tabs v-model="queryParams.tabActive" type="card" @tab-click="handleClick">
-				<el-tab-pane label="上级渠道" name="first"></el-tab-pane>
-				<el-tab-pane label="下级渠道" name="second"></el-tab-pane>
-			</el-tabs>
-			<div class="AddLayMent" @click.stop="addChannel">新增渠道</div>
-		</div>
-		<div class="LayMent-input m1-margin-top-to-bottom">
-			<div class="select-1 m1-margin-left-to-right">
-				<el-select v-model="queryParams.channelType" placeholder="类型" class="select-default">
-					<el-option
-						v-for="item in channelList"
-						:key="item.value"
-						:label="item.label"
-						:value="item.value"
-					></el-option>
-				</el-select>
-			</div>
-			<div class="search m1-margin-left-to-right">
-				<el-input
-					:clearable="true"
-					placeholder="搜索渠道编号、名称、手机号"
-					v-model="queryParams.searchInput"
-					class="input-with-select active-margin"
-				>
-					<el-button
-						slot="append"
-						icon="el-icon-search"
-						class="search-icon"
-						@click.stop="search"
-					></el-button>
-				</el-input>
-			</div>
-			<div class="custom-flex m1-margin-left-to-right">
-				<el-button @click.stop="search">搜索</el-button>
-			</div>
-			<div class="custom-flex rester m1-margin-left-to-right">
-				<el-button @click.stop="handleRest">重置</el-button>
+	<div class="channel-second">
+		<div class="cs-search">
+			<div class="cs-flex">
+				<div class="select-1 m1-margin-left-to-right">
+					<el-date-picker
+						v-model="queryParams.orderTime"
+						type="date"
+						value-format="yyyy-MM-dd"
+						placeholder="下单时间"
+					></el-date-picker>
+				</div>
+				<div class="select-1 m1-margin-left-to-right">
+					<el-select
+						v-model="queryParams.counselorType"
+						placeholder="顾问类型"
+						class="select-default"
+					>
+						<el-option
+							v-for="item in counselorTypeList"
+							:key="item.value"
+							:label="item.label"
+							:value="item.value"
+						></el-option>
+					</el-select>
+				</div>
+				<div class="search m1-margin-left-to-right">
+					<el-input
+						:clearable="true"
+						placeholder="搜索负责渠道、客户名称、手机号"
+						v-model="queryParams.searchInput"
+						class="input-with-select active-margin"
+					>
+						<el-button
+							slot="append"
+							icon="el-icon-search"
+							class="search-icon"
+							@click.stop="search"
+						></el-button>
+					</el-input>
+				</div>
+				<div class="custom-flex m1-margin-left-to-right">
+					<el-button @click.stop="search">搜索</el-button>
+				</div>
+				<div class="custom-flex rester m1-margin-left-to-right">
+					<el-button @click.stop="handleRest">重置</el-button>
+				</div>
 			</div>
 		</div>
 		<div class="total-tip">
-			共有
-			<span style="color: #409eff">{{ total }}</span>
-			名上级渠道
+			企业顾问服务
+			<span style="color: #409eff">{{ companyTotal }}</span>
+			单，私人顾问服务
+			<span style="color: #409eff">{{ personalTotal }}</span>
+			单
 		</div>
 		<div class="LayMent-table m1-margin-top-to-bottom">
 			<div class="healthName">
@@ -57,19 +66,21 @@
 					"
 					style="width: 100%"
 				>
-					<el-table-column prop="channelNo" label="渠道编号"></el-table-column>
-					<el-table-column prop="channelName" label="渠道名称"></el-table-column>
+					<el-table-column prop="orderNo" label="订单号"></el-table-column>
+					<el-table-column prop="orderName" label="订单名称"></el-table-column>
+					<el-table-column prop="userName" label="客户名称"></el-table-column>
 					<el-table-column prop="mobile" label="手机号"></el-table-column>
-					<el-table-column prop="channelType" label="渠道类型"></el-table-column>
-					<el-table-column prop="channelCount" label="拥有渠道"></el-table-column>
-					<el-table-column prop="personCount" label="邀请用户数"></el-table-column>
-					<el-table-column prop="companyOrderCount" label="企业顾问下单数"></el-table-column>
-					<el-table-column prop="personalOrderCount" label="个人顾问下单数"></el-table-column>
+					<el-table-column prop="channel" label="负责渠道"></el-table-column>
+					<el-table-column prop="orderType" label="下单方式"></el-table-column>
+					<el-table-column prop="attachedService" label="附加服务"></el-table-column>
+					<el-table-column prop="payMoney" label="实际支付金额"></el-table-column>
+					<el-table-column prop="payPlatform" label="下单平台"></el-table-column>
+					<el-table-column prop="price" label="分润"></el-table-column>
+					<el-table-column prop="expireTime" label="服务到期时间"></el-table-column>
 					<el-table-column label="操作" width="140px" fixed="right">
 						<template slot-scope="scope">
 							<div class="operation">
 								<div class="m1-margin-left-to-right" @click.stop="toDetail(scope.row)">查看</div>
-								<div class="m1-margin-left-to-right" @click.stop="toEdit(scope.row)">编辑</div>
 							</div>
 						</template>
 					</el-table-column>
@@ -97,28 +108,33 @@ export default {
 	data() {
 		return {
 			total: 0,
+			companyTotal: 120,
+			personalTotal: 112,
 			queryParams: {
 				pageNum: 1,
 				pageSize: 10,
-				tabActive: 'first',
-				channelType: null,
+				orderTime: null,
+				counselorType: null,
 				searchInput: null,
 			},
-			channelList: [
-				{ label: '类型一', value: 1 },
-				{ label: '类型二', value: 2 },
+			counselorTypeList: [
+				{ label: '企业法律顾问', value: 1 },
+				{ label: '私人法律顾问', value: 2 },
 			],
 			tableData: [
 				{
 					id: 1,
-					channelNo: 'CH00001',
-					channelName: '新宇宙公司',
-					mobile: '13308201102',
-					channelType: '合作',
-					channelCount: 18,
-					personCount: 10,
-					companyOrderCount: 18,
-					personalOrderCount: 18,
+					orderNo: 'OD0001',
+					orderName: '买法律服务',
+					userName: '李强',
+					mobile: '18901800121',
+					channel: '张敏',
+					orderType: '注册后下单',
+					attachedService: '暂无',
+					payMoney: 1200,
+					payPlatform: 'APP',
+					price: 100,
+					expireTime: '2021-10-12 12:02:23',
 				},
 			],
 		}
@@ -130,23 +146,8 @@ export default {
 		submitForm() {
 			console.log('submit')
 		},
-		addChannel() {
-			this.$router.push({
-				path: '/channel/addChannel',
-			})
-		},
-		toDetail({ id = '', channelName = '' }) {
-			this.$router.push({
-				path: `/channel/detail?id=${id}&channelName=${channelName}&action=detail`,
-			})
-		},
-		toEdit({ id = '', channelName = '' }) {
-			this.$router.push({
-				path: `/channel/detail?id=${id}&channelName=${channelName}&action=edit`,
-			})
-		},
-		handleClick(tab, event) {
-			console.log(tab)
+		toDetail() {
+			console.log('查看详情')
 		},
 		getList() {
 			// 请求列表
@@ -160,7 +161,8 @@ export default {
 			this.getList()
 		},
 		handleRest() {
-			this.queryParams.channelType = null
+			this.queryParams.orderTime = null
+			this.queryParams.counselorType = null
 			this.queryParams.searchInput = null
 			this.getList()
 		},
@@ -169,7 +171,25 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.accountManagement {
+.channel-second {
+	.cs-search {
+		display: flex;
+		justify-content: space-between;
+	}
+	.cs-flex {
+		display: flex;
+	}
+	.add-channel {
+		color: white;
+		padding: 0 24px;
+		font-size: 14px;
+		background-color: #1989fa;
+		cursor: pointer;
+		line-height: 36px;
+	}
+	.total-tip {
+		padding: 20px 0 10px;
+	}
 	.accMent-tab {
 		display: flex;
 		align-items: center;

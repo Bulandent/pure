@@ -1,13 +1,132 @@
 <template>
-	<div class="channel-detail">
+	<div class="channel-first">
 		<div v-if="isDisabled" class="edit-btn">
 			<i @click="isEdit = !isEdit" class="el-icon-edit-outline"></i>
 		</div>
 		<el-form :model="channelForm" :rules="rules" ref="channelForm" label-width="140px">
-			<el-form-item label="渠道编号" prop="channelNo">
-				<el-input type="text" v-model="channelForm.channelNo" :disabled="true"></el-input>
-			</el-form-item>
+			<h4 class="title-h4">基本规则</h4>
+			<div class="channel-part">
+				<el-form-item v-if="isDetail" label="渠道编号" prop="channelNo">
+					<el-input type="text" v-model="channelForm.channelNo" :disabled="true"></el-input>
+				</el-form-item>
+				<el-form-item label="渠道名称" prop="channelName">
+					<el-input type="text" v-model="channelForm.channelName" :disabled="isDisabled"></el-input>
+				</el-form-item>
+				<el-form-item label="手机号" prop="mobile">
+					<el-input type="text" v-model="channelForm.mobile" :disabled="isDisabled"></el-input>
+				</el-form-item>
+				<el-form-item label="类型" prop="originType">
+					<el-select v-model="channelForm.originType" :disabled="isDisabled">
+						<el-option
+							v-for="item in originTypeList"
+							:key="item.value"
+							:label="item.label"
+							:value="item.value"
+						></el-option>
+					</el-select>
+				</el-form-item>
+				<el-form-item label="渠道等级" prop="channelLevel">
+					<el-select v-model="channelForm.channelLevel" :disabled="isDisabled || isAddSub">
+						<el-option
+							v-for="item in channelLevelList"
+							:key="item.value"
+							:label="item.label"
+							:value="item.value"
+						></el-option>
+					</el-select>
+				</el-form-item>
+				<el-form-item label="渠道类型" prop="channelType">
+					<el-select v-model="channelForm.channelType" :disabled="isDisabled">
+						<el-option
+							v-for="item in channelTypeList"
+							:key="item.value"
+							:label="item.label"
+							:value="item.value"
+						></el-option>
+					</el-select>
+				</el-form-item>
+				<el-form-item v-if="isAddSub" label="所属渠道" prop="channelOf">
+					<el-input type="text" v-model="channelForm.channelOf" :disabled="true"></el-input>
+				</el-form-item>
+				<el-form-item label="统一信用代码" prop="creditCode">
+					<el-input type="text" v-model="channelForm.creditCode" :disabled="isDisabled"></el-input>
+				</el-form-item>
+				<el-form-item v-if="channelForm.originType === 1" label="营业执照副本" prop="licenseUrl">
+					<el-upload
+						class="upload-demo"
+						action=""
+						:disabled="isDisabled"
+						:on-change="(file, fileList) => handleFileChange(file, fileList, 'licenseUrl')"
+						:show-file-list="false"
+						:accept="acceptFile"
+						:before-upload="beforeUpload"
+					>
+						<el-input
+							type="text"
+							v-model="channelForm.licenseUrl"
+							:disabled="isDisabled"
+							placeholder="点击上传"
+						></el-input>
+					</el-upload>
+				</el-form-item>
+				<template v-else>
+					<el-form-item label="身份证正面" prop="IDCardFirstUrl">
+						<el-upload
+							class="upload-demo"
+							action=""
+							:disabled="isDisabled"
+							:on-change="(file, fileList) => handleFileChange(file, fileList, 'IDCardFirstUrl')"
+							:show-file-list="false"
+							:accept="acceptFile"
+							:before-upload="beforeUpload"
+						>
+							<el-input
+								type="text"
+								v-model="channelForm.IDCardFirstUrl"
+								:disabled="isDisabled"
+								placeholder="点击上传"
+							></el-input>
+						</el-upload>
+					</el-form-item>
+					<el-form-item label="身份证反面" prop="IDCardSecondUrl">
+						<el-upload
+							class="upload-demo"
+							action=""
+							:disabled="isDisabled"
+							:on-change="(file, fileList) => handleFileChange(file, fileList, 'IDCardSecondUrl')"
+							:show-file-list="false"
+							:accept="acceptFile"
+							:before-upload="beforeUpload"
+						>
+							<el-input
+								type="text"
+								v-model="channelForm.IDCardFirstUrl"
+								:disabled="isDisabled"
+								placeholder="点击上传"
+							></el-input>
+						</el-upload>
+					</el-form-item>
+				</template>
+				<el-form-item label="收款银行" prop="collectBank">
+					<el-input type="text" v-model="channelForm.collectBank" :disabled="isDisabled"></el-input>
+				</el-form-item>
+				<el-form-item label="收款支行" prop="bankBranch">
+					<el-input type="text" v-model="channelForm.bankBranch" :disabled="isDisabled"></el-input>
+				</el-form-item>
+				<el-form-item label="银行卡号" prop="cardNo">
+					<el-input type="text" v-model="channelForm.cardNo" :disabled="isDisabled"></el-input>
+				</el-form-item>
+				<el-form-item label="签约时间" prop="signTime">
+					<el-date-picker
+						v-model="channelForm.signTime"
+						type="date"
+						:disabled="isDisabled"
+						placeholder="选择日期"
+					></el-date-picker>
+				</el-form-item>
+			</div>
 
+			<h4 class="title-h4">分润规则</h4>
 			<h5 class="part-title">企业法律顾问</h5>
 			<div class="channel-part">
 				<el-form-item label="分润方式" prop="company.profitTypeA">
@@ -319,14 +438,42 @@ export default {
 			id: '',
 			activeTab: 'first',
 			isDetail: false,
+			isAddSub: false,
 			isRequesting: false,
 			isEdit: false,
+			acceptFile: '.pdf,.png,.jpeg,.jpg',
 			profitList: [
 				{ label: '固定金额', value: 1 },
 				{ label: '固定比率', value: 2 },
 			],
+			originTypeList: [
+				{ label: '企业', value: 1 },
+				{ label: '个人', value: 2 },
+			],
+			channelLevelList: [
+				{ label: '上级渠道', value: 1 },
+				{ label: '下级渠道', value: 2 },
+			],
+			channelTypeList: [
+				{ label: '渠道类型一', value: 1 },
+				{ label: '渠道类型二', value: 2 },
+			],
 			channelForm: {
+				channelNo: null,
 				channelName: null,
+				mobile: null,
+				originType: null,
+				channelLevel: null,
+				channelType: null,
+				channelOf: null,
+				creditCode: null,
+				licenseUrl: null,
+				IDCardFirstUrl: null,
+				IDCardSecondUrl: null,
+				collectBank: null,
+				bankBranch: null,
+				cardNo: null,
+				signTime: null,
 				monthCount: null,
 				company: {
 					profitType: null,
@@ -336,7 +483,21 @@ export default {
 				personal: {},
 			},
 			rules: {
+				channelNo: [{ required: true, message: '必填', trigger: 'blur' }],
 				channelName: [{ required: true, message: '必填', trigger: 'blur' }],
+				mobile: [{ required: true, message: '必填', trigger: 'blur' }],
+				originType: [{ required: true, message: '必填', trigger: 'change' }],
+				channelLevel: [{ required: true, message: '必填', trigger: 'change' }],
+				channelType: [{ required: true, message: '必填', trigger: 'change' }],
+				channelOf: [{ required: true, message: '必填', trigger: 'blur' }],
+				creditCode: [{ required: true, message: '必填', trigger: 'blur' }],
+				licenseUrl: [{ required: true, message: '必填', trigger: 'change' }],
+				IDCardFirstUrl: [{ required: true, message: '必填', trigger: 'change' }],
+				IDCardSecondUrl: [{ required: true, message: '必填', trigger: 'change' }],
+				collectBank: [{ required: true, message: '必填', trigger: 'blur' }],
+				bankBranch: [{ required: true, message: '必填', trigger: 'blur' }],
+				cardNo: [{ required: true, message: '必填', trigger: 'blur' }],
+				signTime: [{ required: true, message: '必填', trigger: 'change' }],
 				monthCount: [
 					{ required: true, message: '必填', trigger: 'blur' },
 					{ pattern: regExp, message: '格式不正确', trigger: 'blur' },
@@ -408,18 +569,43 @@ export default {
 		},
 	},
 	created() {
-		this.isDetail = this.$route.path.includes('channelDetail')
+		this.isDetail = this.$route.path.includes('detail')
+		this.isAddSub = this.$route.path.includes('addSubChannel')
 		if (this.isDetail) {
 			this.id = this.$route.query.id
 			this.getDetail()
 		}
+		if (this.isAddSub) {
+			this.channelForm.channelLevel = 2
+			this.channelForm.channelOf = this.$route.query.channelName
+		}
 	},
 	methods: {
+		beforeUpload(file) {
+			const suffixs = /\.[^\.]+$/.exec(file.name)
+			if (!this.templateAcceptFile.includes(suffixs[0])) {
+				this.$message.warning(`限制上传 ${this.templateAcceptFile} 格式的图片`)
+				return false
+			}
+			return true
+		},
+		handleFileChange(file, fileList, param) {
+			console.log(file, fileList)
+			this.channelForm[param] = file.name
+		},
 		getProfitLabel(val) {
 			return val === 1 ? '分润金额' : '分润比率'
 		},
 		getProfitSuffix(val) {
 			return val === 1 ? '元' : '%'
+		},
+		handleTemplateFileChange(file, fileList) {
+			console.log(file, fileList)
+			this.channelForm.templateUrl = file.name
+		},
+		handlePreviewFileChange(file, fileList) {
+			console.log(file, fileList)
+			this.channelForm.previewUrl = file.name
 		},
 		getDetail() {
 			// 获取详情
@@ -451,16 +637,21 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.channel-detail {
+.channel-first {
 	position: relative;
-	padding: 40px 50px 0;
 	.channel-part {
 		display: flex;
 		flex-wrap: wrap;
 		.el-form-item {
 			width: 50%;
 		}
-		.el-select {
+		.el-select,
+		.el-date-editor {
+			width: 100%;
+		}
+	}
+	::v-deep {
+		.el-upload {
 			width: 100%;
 		}
 	}
@@ -479,6 +670,10 @@ export default {
 			left: 0;
 			top: 3px;
 		}
+	}
+	.title-h4 {
+		border-left: 3px solid #409eff;
+		padding-left: 10px;
 	}
 	.action-area {
 		padding-top: 50px;

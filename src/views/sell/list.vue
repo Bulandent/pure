@@ -1,17 +1,10 @@
 <template>
 	<div class="accountManagement">
-		<div class="accMent-tab m1-margin-top-to-bottom">
-			<el-tabs v-model="queryParams.tabActive" type="card" @tab-click="handleClick">
-				<el-tab-pane label="上级渠道" name="first"></el-tab-pane>
-				<el-tab-pane label="下级渠道" name="second"></el-tab-pane>
-			</el-tabs>
-			<div class="AddLayMent" @click.stop="addChannel">新增渠道</div>
-		</div>
 		<div class="LayMent-input m1-margin-top-to-bottom">
 			<div class="select-1 m1-margin-left-to-right">
-				<el-select v-model="queryParams.channelType" placeholder="类型" class="select-default">
+				<el-select v-model="queryParams.sellRole" placeholder="销售角色" class="select-default">
 					<el-option
-						v-for="item in channelList"
+						v-for="item in roleList"
 						:key="item.value"
 						:label="item.label"
 						:value="item.value"
@@ -21,7 +14,7 @@
 			<div class="search m1-margin-left-to-right">
 				<el-input
 					:clearable="true"
-					placeholder="搜索渠道编号、名称、手机号"
+					placeholder="搜索姓名、手机号"
 					v-model="queryParams.searchInput"
 					class="input-with-select active-margin"
 				>
@@ -40,11 +33,6 @@
 				<el-button @click.stop="handleRest">重置</el-button>
 			</div>
 		</div>
-		<div class="total-tip">
-			共有
-			<span style="color: #409eff">{{ total }}</span>
-			名上级渠道
-		</div>
 		<div class="LayMent-table m1-margin-top-to-bottom">
 			<div class="healthName">
 				<el-table
@@ -57,19 +45,20 @@
 					"
 					style="width: 100%"
 				>
-					<el-table-column prop="channelNo" label="渠道编号"></el-table-column>
-					<el-table-column prop="channelName" label="渠道名称"></el-table-column>
+					<el-table-column prop="userName" label="姓名"></el-table-column>
+					<el-table-column prop="sellRole" label="角色"></el-table-column>
 					<el-table-column prop="mobile" label="手机号"></el-table-column>
-					<el-table-column prop="channelType" label="渠道类型"></el-table-column>
-					<el-table-column prop="channelCount" label="拥有渠道"></el-table-column>
 					<el-table-column prop="personCount" label="邀请用户数"></el-table-column>
 					<el-table-column prop="companyOrderCount" label="企业顾问下单数"></el-table-column>
 					<el-table-column prop="personalOrderCount" label="个人顾问下单数"></el-table-column>
+					<el-table-column prop="monthPrice" label="本月业绩（元）"></el-table-column>
+					<el-table-column prop="monthRoyalty" label="本月提成（元）"></el-table-column>
+					<el-table-column prop="lastMonthPrice" label="上月业绩（元）"></el-table-column>
+					<el-table-column prop="lastMonthRoyalty" label="上月提成（元）"></el-table-column>
 					<el-table-column label="操作" width="140px" fixed="right">
 						<template slot-scope="scope">
 							<div class="operation">
 								<div class="m1-margin-left-to-right" @click.stop="toDetail(scope.row)">查看</div>
-								<div class="m1-margin-left-to-right" @click.stop="toEdit(scope.row)">编辑</div>
 							</div>
 						</template>
 					</el-table-column>
@@ -100,25 +89,26 @@ export default {
 			queryParams: {
 				pageNum: 1,
 				pageSize: 10,
-				tabActive: 'first',
-				channelType: null,
-				searchInput: null,
+				sellRole: null,
+				searhInput: null,
 			},
-			channelList: [
-				{ label: '类型一', value: 1 },
-				{ label: '类型二', value: 2 },
+			roleList: [
+				{ label: '销售经理', value: 1 },
+				{ label: '电话经理', value: 2 },
 			],
 			tableData: [
 				{
 					id: 1,
-					channelNo: 'CH00001',
-					channelName: '新宇宙公司',
+					userName: '黄海',
+					sellRole: '销售经理',
 					mobile: '13308201102',
-					channelType: '合作',
-					channelCount: 18,
 					personCount: 10,
 					companyOrderCount: 18,
 					personalOrderCount: 18,
+					monthPrice: 18,
+					monthRoyalty: 18,
+					lastMonthPrice: 18,
+					lastMonthRoyalty: 18,
 				},
 			],
 		}
@@ -127,26 +117,10 @@ export default {
 		this.getList()
 	},
 	methods: {
-		submitForm() {
-			console.log('submit')
-		},
-		addChannel() {
-			this.$router.push({
-				path: '/channel/addChannel',
-			})
-		},
 		toDetail({ id = '', channelName = '' }) {
 			this.$router.push({
-				path: `/channel/detail?id=${id}&channelName=${channelName}&action=detail`,
+				path: `/sell/detail?id=${id}`,
 			})
-		},
-		toEdit({ id = '', channelName = '' }) {
-			this.$router.push({
-				path: `/channel/detail?id=${id}&channelName=${channelName}&action=edit`,
-			})
-		},
-		handleClick(tab, event) {
-			console.log(tab)
 		},
 		getList() {
 			// 请求列表
@@ -160,7 +134,7 @@ export default {
 			this.getList()
 		},
 		handleRest() {
-			this.queryParams.channelType = null
+			this.queryParams.sellRole = null
 			this.queryParams.searchInput = null
 			this.getList()
 		},

@@ -1,44 +1,40 @@
 <template>
-	<div class="accountManagement">
-		<div class="accMent-tab m1-margin-top-to-bottom">
-			<el-tabs v-model="queryParams.tabActive" type="card" @tab-click="handleClick">
-				<el-tab-pane label="上级渠道" name="first"></el-tab-pane>
-				<el-tab-pane label="下级渠道" name="second"></el-tab-pane>
-			</el-tabs>
-			<div class="AddLayMent" @click.stop="addChannel">新增渠道</div>
-		</div>
-		<div class="LayMent-input m1-margin-top-to-bottom">
-			<div class="select-1 m1-margin-left-to-right">
-				<el-select v-model="queryParams.channelType" placeholder="类型" class="select-default">
-					<el-option
-						v-for="item in channelList"
-						:key="item.value"
-						:label="item.label"
-						:value="item.value"
-					></el-option>
-				</el-select>
+	<div class="channel-second">
+		<div class="cs-search">
+			<div class="cs-flex">
+				<div class="select-1 m1-margin-left-to-right">
+					<el-select v-model="queryParams.channelType" placeholder="类型" class="select-default">
+						<el-option
+							v-for="item in channelList"
+							:key="item.value"
+							:label="item.label"
+							:value="item.value"
+						></el-option>
+					</el-select>
+				</div>
+				<div class="search m1-margin-left-to-right">
+					<el-input
+						:clearable="true"
+						placeholder="搜索渠道编号、名称、手机号"
+						v-model="queryParams.searchInput"
+						class="input-with-select active-margin"
+					>
+						<el-button
+							slot="append"
+							icon="el-icon-search"
+							class="search-icon"
+							@click.stop="search"
+						></el-button>
+					</el-input>
+				</div>
+				<div class="custom-flex m1-margin-left-to-right">
+					<el-button @click.stop="search">搜索</el-button>
+				</div>
+				<div class="custom-flex rester m1-margin-left-to-right">
+					<el-button @click.stop="handleRest">重置</el-button>
+				</div>
 			</div>
-			<div class="search m1-margin-left-to-right">
-				<el-input
-					:clearable="true"
-					placeholder="搜索渠道编号、名称、手机号"
-					v-model="queryParams.searchInput"
-					class="input-with-select active-margin"
-				>
-					<el-button
-						slot="append"
-						icon="el-icon-search"
-						class="search-icon"
-						@click.stop="search"
-					></el-button>
-				</el-input>
-			</div>
-			<div class="custom-flex m1-margin-left-to-right">
-				<el-button @click.stop="search">搜索</el-button>
-			</div>
-			<div class="custom-flex rester m1-margin-left-to-right">
-				<el-button @click.stop="handleRest">重置</el-button>
-			</div>
+			<div class="add-channel" @click.stop="addChannel">新增下属渠道</div>
 		</div>
 		<div class="total-tip">
 			共有
@@ -100,13 +96,12 @@ export default {
 			queryParams: {
 				pageNum: 1,
 				pageSize: 10,
-				tabActive: 'first',
 				channelType: null,
 				searchInput: null,
 			},
 			channelList: [
-				{ label: '类型一', value: 1 },
-				{ label: '类型二', value: 2 },
+				{ label: '企业', value: 1 },
+				{ label: '个人', value: 2 },
 			],
 			tableData: [
 				{
@@ -131,18 +126,19 @@ export default {
 			console.log('submit')
 		},
 		addChannel() {
+			const channelName = this.$route.query.channelName
 			this.$router.push({
-				path: '/channel/addChannel',
+				path: `/channel/addSubChannel?channelName=${channelName}`,
 			})
 		},
-		toDetail({ id = '', channelName = '' }) {
+		toDetail({ id = '' }) {
 			this.$router.push({
-				path: `/channel/detail?id=${id}&channelName=${channelName}&action=detail`,
+				path: `/channel/detail?id=${id}&action=detail`,
 			})
 		},
-		toEdit({ id = '', channelName = '' }) {
+		toEdit({ id = '' }) {
 			this.$router.push({
-				path: `/channel/detail?id=${id}&channelName=${channelName}&action=edit`,
+				path: `/channel/detail?id=${id}&action=edit`,
 			})
 		},
 		handleClick(tab, event) {
@@ -169,7 +165,25 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.accountManagement {
+.channel-second {
+	.cs-search {
+		display: flex;
+		justify-content: space-between;
+	}
+	.cs-flex {
+		display: flex;
+	}
+	.add-channel {
+		color: white;
+		padding: 0 24px;
+		font-size: 14px;
+		background-color: #1989fa;
+		cursor: pointer;
+		line-height: 36px;
+	}
+	.total-tip {
+		padding: 20px 0 10px;
+	}
 	.accMent-tab {
 		display: flex;
 		align-items: center;
