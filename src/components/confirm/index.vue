@@ -4,6 +4,9 @@
 			<span slot="title">
 				<div class="alert-title">{{ alertData.title }}</div>
 			</span>
+			<div class="alert-content" v-if="alertData.content" style="padding-bottom: 20px">
+				<div v-html="alertData.content"></div>
+			</div>
 			<div class="alert-conation">
 				<el-form
 					:model="alertData.ruleForm"
@@ -158,15 +161,12 @@
                  </div>
              </div> -->
 			</div>
-			<div class="alert-content" v-if="alertData.content">
-				{{ alertData.content }}
-			</div>
 			<span slot="footer" class="dialog-footer">
 				<el-button @click="closeForm()">
 					{{ alertData.closeText ? alertData.closeText : '取 消' }}
 				</el-button>
 				<el-button type="primary" @click="submitForm()">
-					{{ alertData.closeText ? alertData.enterText : '确 定' }}
+					{{ alertData.enterText ? alertData.enterText : '确 定' }}
 				</el-button>
 			</span>
 		</el-dialog>
@@ -531,10 +531,10 @@ export default {
 			min-height: 60px !important;
 		}
 	}
-	.alert-content {
-		padding: 50px;
-		text-align: center;
-	}
+	// .alert-content {
+	// 	padding: 50px;
+	// 	text-align: center;
+	// }
 	.alert-conation-for {
 		/deep/ .el-input-group__prepend {
 			padding: 0 12px;

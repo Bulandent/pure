@@ -6,6 +6,7 @@ import { contract } from './contract'
 import { system } from './system'
 import { channel } from './channel'
 import { sell } from './sell'
+import { finance } from './finance'
 
 Vue.use(Router)
 const originalPush = Router.prototype.push
@@ -91,6 +92,7 @@ export const constantRouterMap = [
 	...system,
 	...channel,
 	...sell,
+	...finance,
 ]
 
 export default new Router({
