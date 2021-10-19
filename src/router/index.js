@@ -7,6 +7,7 @@ import { system } from './system'
 import { channel } from './channel'
 import { sell } from './sell'
 import { finance } from './finance'
+import { workbench } from './workbench'
 
 Vue.use(Router)
 const originalPush = Router.prototype.push
@@ -93,6 +94,7 @@ export const constantRouterMap = [
 	...channel,
 	...sell,
 	...finance,
+	...workbench,
 ]
 
 export default new Router({
