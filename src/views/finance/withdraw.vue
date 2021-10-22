@@ -114,7 +114,7 @@
 		<ConfirmAdmin
 			:alert-data="Audit_Data"
 			v-if="showConfrimAudit"
-			@submitForm="submitForm"
+			@submitForm="submitAudit"
 			@closeForm="closeForm"
 		></ConfirmAdmin>
 		<ConfirmAdmin

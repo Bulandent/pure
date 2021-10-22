@@ -16,7 +16,11 @@
 					<el-input type="text" v-model="channelForm.mobile" :disabled="isDisabled"></el-input>
 				</el-form-item>
 				<el-form-item label="类型" prop="originType">
-					<el-select v-model="channelForm.originType" :disabled="isDisabled">
+					<el-select
+						v-model="channelForm.originType"
+						:disabled="isDisabled"
+						@change="changeOriginType"
+					>
 						<el-option
 							v-for="item in originTypeList"
 							:key="item.value"
@@ -48,7 +52,7 @@
 				<el-form-item v-if="isAddSub" label="所属渠道" prop="channelOf">
 					<el-input type="text" v-model="channelForm.channelOf" :disabled="true"></el-input>
 				</el-form-item>
-				<el-form-item label="统一信用代码" prop="creditCode">
+				<el-form-item v-if="channelForm.originType === 1" label="统一信用代码" prop="creditCode">
 					<el-input type="text" v-model="channelForm.creditCode" :disabled="isDisabled"></el-input>
 				</el-form-item>
 				<el-form-item v-if="channelForm.originType === 1" label="营业执照副本" prop="licenseUrl">
@@ -69,7 +73,10 @@
 						></el-input>
 					</el-upload>
 				</el-form-item>
-				<template v-else>
+				<template v-if="channelForm.originType === 2">
+					<el-form-item label="身份证号" prop="idCard">
+						<el-input type="text" v-model="channelForm.idCard" :disabled="isDisabled"></el-input>
+					</el-form-item>
 					<el-form-item label="身份证正面" prop="IDCardFirstUrl">
 						<el-upload
 							class="upload-demo"
@@ -468,6 +475,7 @@ export default {
 				channelOf: null,
 				creditCode: null,
 				licenseUrl: null,
+				idCard: null,
 				IDCardFirstUrl: null,
 				IDCardSecondUrl: null,
 				collectBank: null,
@@ -491,6 +499,7 @@ export default {
 				channelType: [{ required: true, message: '必填', trigger: 'change' }],
 				channelOf: [{ required: true, message: '必填', trigger: 'blur' }],
 				creditCode: [{ required: true, message: '必填', trigger: 'blur' }],
+				idCard: [{ required: true, message: '必填', trigger: 'blur' }],
 				licenseUrl: [{ required: true, message: '必填', trigger: 'change' }],
 				IDCardFirstUrl: [{ required: true, message: '必填', trigger: 'change' }],
 				IDCardSecondUrl: [{ required: true, message: '必填', trigger: 'change' }],
@@ -581,6 +590,17 @@ export default {
 		}
 	},
 	methods: {
+		changeOriginType(val) {
+			console.log(val)
+			if (val === 1) {
+				this.channelForm.idCard = null
+				this.channelForm.IDCardFirstUrl = null
+				this.channelForm.IDCardSecondUrl = null
+			} else {
+				this.channelForm.creditCode = null
+				this.channelForm.licenseUrl = null
+			}
+		},
 		beforeUpload(file) {
 			const suffixs = /\.[^\.]+$/.exec(file.name)
 			if (!this.templateAcceptFile.includes(suffixs[0])) {
